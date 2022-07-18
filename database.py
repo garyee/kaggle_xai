@@ -1,5 +1,5 @@
 from sqlite3 import connect, Error
-from kaggleEnums import filePath
+from kaggleEnums import KaggleEntityType, filePath
 
 databasePath = filePath+"kaggleSqlite.db"
 
@@ -35,12 +35,32 @@ sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_info (
                                         FOREIGN KEY (kernelRef)
                                         REFERENCES kernel_info (kernelRef)
                                 ); """
+def updateEntityTypeAndGoal(data):
+    sqlite_update_with_dict('dataset_info', data,'dataBaseRef')
+
 def insertRowOrIncrementKernelCount(dataSetRef,is_competition):
     query="INSERT OR IGNORE INTO dataset_info (dataBaseRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
     execute_write_query(query)
 
-def getAllDataSetRefs():
-    return execute_read_query("SELECT dataBaseRef FROM dataset_info WHEREis_competition=0")
+def getAllEntityRefs():
+    return execute_read_query("SELECT dataBaseRef,is_competition FROM dataset_info")
+
+def sqlite_update_with_dict(table, data,primaryKeyName, connection=None):
+    global currentConnection
+    connectionToUse = currentConnection or connection
+    if connectionToUse is None:
+        raise Exception("Initialize DB-connection before using it!")
+    try:
+        cursor = currentConnection.cursor()
+        primaryKeyValue=data.pop(primaryKeyName)
+
+        query = f"UPDATE "+table+" SET " + ', '.join(
+            "{}=?".format(k) for k in data.keys()) + f" WHERE "+primaryKeyName+"=?"
+        # uncomment next line for debugging
+        # print(query, list(data.values()) + [pkeyval])
+        cursor.execute(query, list(data.values()) + [primaryKeyValue])
+    except Error as e:
+        print(f"The error '{e}' occurred")
 
 def execute_many(query,data,connection=None):
     global currentConnection
@@ -81,6 +101,13 @@ def execute_read_query(query,connection=None):
     except Error as e:
         print(f"The error '{e}' occurred")
     return []
+
+def getEntityTypeFromDBentry(dbentry):
+    if(dbentry==1):
+        return KaggleEntityType.COMPETITION
+    elif(dbentry==0):
+        return KaggleEntityType.DATASET
+    return KaggleEntityType.NONE
 
 # def create_tables(db_file):
 #     conn = None

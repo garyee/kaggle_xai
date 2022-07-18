@@ -35,8 +35,3 @@ def analyseOneMetaDataFile(filePath,resDict):
 #See DB Fields & order matters:
 metaDataType=['Time Series','Tabular']
 metaDataGoal=['regression','classification']
-
-
-
-
-analyseDataSetMetaData("calebreigada/us-air-quality-1980present",{})
