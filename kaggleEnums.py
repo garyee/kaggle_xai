@@ -12,7 +12,9 @@ class KernelLanguage(Enum):
 
 parentEntityPathStrList=['datasets','competitions','none']
 
-basePath= '/content/drive/MyDrive/Colab/Kaggle/kernels/'
+#filePath= '/content/drive/MyDrive/Colab'
+filePath="C:\\Users\\garyee\\gDrive\\Colab"
+basePath= filePath+'/Kaggle/kernels/'
 basePathPerDataSet= basePath+'datasets'
 basePathPerCompetitions= basePath+'competitions'
 basePathNone= basePath+'none'

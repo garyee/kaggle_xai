@@ -1,7 +1,5 @@
 from kaggleEnums import KaggleEntityType
 
-filePath= '/content/drive/MyDrive/Colab'
-
 kernelListPageSize=100
 
 testKernelsRefs={KaggleEntityType.DATASET: {},
