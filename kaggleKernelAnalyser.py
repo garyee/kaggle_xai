@@ -1,8 +1,7 @@
 import os
 from tqdm.notebook import trange, tqdm
 import json
-from kaggleEnums import basePath,KaggleEntityType, KernelLanguage, getAllInfoFromKernelPath
-from main import testKernelsRefs
+from kaggleEnums import basePath,KaggleEntityType, KernelLanguage, getAllInfoFromKernelPath, testKernelsRefs
 from kaggleDownloader import downloadKernelByRef,getKernelPath
 from KaggleKernelCodeAnalyzer import XaiAnalyser
 import database
