@@ -38,7 +38,7 @@ sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_info (
 def updateEntityTypeAndGoal(data):
     sqlite_update_with_dict('dataset_info', data,'dataBaseRef')
 
-def insertRowOrIncrementKernelCount(dataSetRef,is_competition):
+def insertDataBase(dataSetRef,is_competition):
     query="INSERT OR IGNORE INTO dataset_info (dataBaseRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
     execute_write_query(query)
 

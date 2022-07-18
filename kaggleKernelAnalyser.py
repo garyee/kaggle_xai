@@ -11,7 +11,7 @@ def analyseTestKernels():
     return anaylseKernels(getTestKernelFiles())
 
 def analyseAllKernels():
-    return anaylseKernels(getAllFilePaths)
+    return anaylseKernels(getAllFilePaths())
 
 def anaylseKernels(filePaths):
     database.initConnection()
@@ -19,7 +19,7 @@ def anaylseKernels(filePaths):
     for filePath in tqdm(filePaths):
         parentEntityType,parentEntityRef,entityRef,kernelFileName = getAllInfoFromKernelPath(filePath)
         if parentEntityRef is not None:
-            database.insertRowOrIncrementKernelCount(parentEntityRef,1 if parentEntityType==KaggleEntityType.COMPETITION else 0)
+            database.insertDataBase(parentEntityRef,1 if parentEntityType==KaggleEntityType.COMPETITION else 0)
         new_matches=analyseOneKernelFile(filePath)
         matches = merge_two_dicts(matches,new_matches)
     database.closeConnection()
@@ -60,7 +60,7 @@ def getAllFilePaths(directory=basePath):
     for subdir, dirs, files in os.walk(directory):
         for file in files:
           if(file.endswith('ipynb')):
-            matches.append(os.path.join(subdir, file))
+            matches.append(os.path.join(subdir, file).replace("\\\\","/"))
     return matches
 
 def merge_two_dicts(x, y):

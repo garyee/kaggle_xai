@@ -1,11 +1,13 @@
-from database import getEntityTypeFromDBentry, updateEntityTypeAndGoal
+import database
 from kaggleEnums import KaggleEntityType
 from kaggleFileMetaDataAnalyser import analyseDataSetMetaData
 from kaggleEntityFileListAnalyser import analyseEntityFileList
 
 def analyseAllAndSetType(dataSetList):
+    database.initConnection()
     for entityDict in dataSetList:
-        analyseOneEntity(entityDict['dataBaseRef'],getEntityTypeFromDBentry(entityDict['is_competition']))
+        analyseOneEntity(entityDict['dataBaseRef'],database.getEntityTypeFromDBentry(entityDict['is_competition']))
+    database.closeConnection()
 
 def analyseOneEntity(entityRef,entityType):
     if(entityType!=KaggleEntityType.NONE):
@@ -15,7 +17,7 @@ def analyseOneEntity(entityRef,entityType):
             analyseDataSetMetaData(entityRef,resultingRow)
         if 'type' not in resultingRow:
             analyseEntityFileList(entityRef,resultingRow)
-        updateEntityTypeAndGoal(resultingRow)
+        database.updateEntityTypeAndGoal(resultingRow)
         #DownloadFiles
         #AnalyseMetadata-keywords
         

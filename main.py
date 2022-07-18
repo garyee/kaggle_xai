@@ -1,5 +1,5 @@
-from kaggleKernelAnalyser import analyseTestKernels
+from kaggleKernelAnalyser import analyseTestKernels,analyseAllKernels
 import database
 
-#anaylseAllKernels()
-analyseTestKernels()
+analyseAllKernels()
+#analyseTestKernels()

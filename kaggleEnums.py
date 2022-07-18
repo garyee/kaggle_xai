@@ -40,7 +40,7 @@ testKernelsRefs={KaggleEntityType.DATASET: {},
 parentEntityPathStrList=['datasets','competitions','none']
 
 #filePath= '/content/drive/MyDrive/Colab'
-filePath="C:\\Users\\garyee\\gDrive\\Colab\\Kaggle\\"
+filePath="C:/Users/garyee/gDrive/Colab/Kaggle/"
 basePath= filePath+'kernels/'
 basePathPerDataSet= basePath+'datasets'
 basePathPerCompetitions= basePath+'competitions'
@@ -77,12 +77,15 @@ def getKaggleEntityTypeFromString(entityStr):
 
 def getAllInfoFromKernelPath(filePath):
   if basePath not in filePath:
-    print(filePath+'is not a kernel path1!')
+    print(filePath+' is not a kernel path1!')
     return
   currentPathStr=filePath.replace(basePath,'')
-  pathPartsList=currentPathStr.split('/')
+  # pathPartsList=currentPathStr.split('/')
+  normalized_path = os.path.normpath(currentPathStr)
+  pathPartsList = normalized_path.split(os.sep)
+  # pathPartsList=os.path.split(currentPathStr)
   if pathPartsList[0] not in parentEntityPathStrList:
-    print(filePath+'is not a kernel path2!')
+    print(filePath+' is not a kernel path2!')
     return
   parentEntityType=getKaggleEntityTypeFromString(pathPartsList[0])
   if parentEntityType==KaggleEntityType.NONE and len(pathPartsList)==3:
@@ -94,7 +97,7 @@ def getAllInfoFromKernelPath(filePath):
     entityRef=getKaggleRefFromFilePathPartStr(pathPartsList[2])
     kernelFileName=pathPartsList[3]
   else:
-    print(filePath+'is not a kernel path3!')
+    print(filePath+' is not a kernel path3!')
     return
   return parentEntityType,parentEntityRef,entityRef,kernelFileName
   
