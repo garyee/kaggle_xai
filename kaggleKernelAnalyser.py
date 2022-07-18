@@ -25,7 +25,7 @@ def anaylseKernels(filePaths):
     database.closeConnection()
     return matches
 
-def analyseOneKernelFile(filePath,write2File=True):
+def analyseOneKernelFile(filePath):
     matches={}
     with open(filePath) as f:
         kernelCode={}

@@ -8,7 +8,7 @@ currentConnection=None
 sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     dataBaseRef text NOT NULL PRIMARY KEY,
                                     is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
-                                    type TEXT CHECK( type IN ('Tabular','Image','Video','Text','DB','Misc') ) DEFAULT NULL,
+                                    type TEXT CHECK( type IN ('Tabular','Image','Video','Text','DB','Time Series','Misc') ) DEFAULT NULL,
                                     tab_corr REAL NULL DEFAULT NULL,
                                     tab_interaction REAL NULL DEFAULT NULL,
                                     tab_features_total INTEGER NULL DEFAULT NULL,
@@ -37,7 +37,10 @@ sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_info (
                                 ); """
 def insertRowOrIncrementKernelCount(dataSetRef,is_competition):
     query="INSERT OR IGNORE INTO dataset_info (dataBaseRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
-    execute_query(query)
+    execute_write_query(query)
+
+def getAllDataSetRefs():
+    return execute_read_query("SELECT dataBaseRef FROM dataset_info WHEREis_competition=0")
 
 def execute_many(query,data,connection=None):
     global currentConnection
@@ -53,7 +56,7 @@ def execute_many(query,data,connection=None):
         print(f"The error '{e}' occurred")
 
 
-def execute_query(query,connection=None):
+def execute_write_query(query,connection=None):
     global currentConnection
     connectionToUse = currentConnection or connection
     if connectionToUse is None:
@@ -66,25 +69,37 @@ def execute_query(query,connection=None):
     except Error as e:
         print(f"The error '{e}' occurred")
 
-
-def create_tables(db_file):
-    conn = None
+def execute_read_query(query,connection=None):
+    global currentConnection
+    connectionToUse = currentConnection or connection
+    if connectionToUse is None:
+        raise Exception("Initialize DB-connection before using it!")
+    cursor = connectionToUse.cursor()
     try:
-        conn = connect(databasePath)
-        execute_query(sql_create_dataset_info,conn)
+        cursor.execute(query)
+        return cursor.fetchall()
     except Error as e:
-        print(e)
-    finally:
-        if conn:
-            conn.close()
+        print(f"The error '{e}' occurred")
+    return []
+
+# def create_tables(db_file):
+#     conn = None
+#     try:
+#         conn = connect(databasePath)
+#         execute_write_query(sql_create_dataset_info,conn)
+#     except Error as e:
+#         print(e)
+#     finally:
+#         if conn:
+#             conn.close()
 
 def initConnection():
     global currentConnection
     try:
         currentConnection = connect(databasePath)
-        execute_query(sql_create_dataset_info)
-        execute_query(sql_create_kernel_info)
-        execute_query(sql_create_xai_methods)
+        execute_write_query(sql_create_dataset_info)
+        execute_write_query(sql_create_kernel_info)
+        execute_write_query(sql_create_xai_methods)
     except Error as e:
         print(e)
 
