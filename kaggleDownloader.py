@@ -1,7 +1,8 @@
 import os
 from kaggleEnums import KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef,kernelListPageSize,testKernelsRefs
 from kaggleHelper import bash,kaggleCommand2DF
-from tqdm.notebook import trange, tqdm
+#from tqdm.notebook import trange, tqdm
+from tqdm import tqdm
 
 def getTestKernels():
     for middleEntityType,kernelDict in testKernelsRefs.keys():

@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from kaggleEnums import explainableAITermesDict
 import re
 
 class KaggleKernelCodeAnalyzer:
@@ -15,20 +16,7 @@ class KaggleKernelCodeAnalyzer:
 
 class XaiAnalyser(KaggleKernelCodeAnalyzer):
 
-  explainableAITermesDict = {
-    "PH_ALE": ["import.*ALE","import.*plot_ale"],
-    "PH_PFI": ["eli5\.show_weights.*","xai.feature_importance"],
-#    "IM": ["sklearn.ensemble"],
-    "PH_LIME": ["import.*lime","from\slime\simport","skater.core.local_interpretation.lime."],
-    "PH_PDP": ["from pdpbox"], 
-    "IM_FI": ["lgbm.plot_importance","xgb.plot_importance"],
-    "PH_SHAP": ["shap.","from alibi.explainers import KernelShap"],
-    "DABL": ["dabl."],
-    "PH_GLOBAL_SURR": ['skater.model'],
-    "IM_RULELIST" : ["skater.core.global_interpretation.interpretable_models.brlc"],
-    "DASHBOARD" : ["from explainerdashboard"],
-    "IM_GAM" :["from pygam import"]
-  }
+  termsDict= explainableAITermesDict 
 
   def getHeader():
     xaiMethodKeys=list(XaiAnalyser.explainableAITermesDict.keys())

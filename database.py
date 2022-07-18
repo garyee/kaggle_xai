@@ -1,7 +1,7 @@
 from sqlite3 import connect, Error
+from kaggleEnums import filePath
 
-databaseBasePath='/content/drive/MyDrive/Colab/Kaggle/'
-databasePath = databaseBasePath+"kaggleSqlite.db"
+databasePath = filePath+"kaggleSqlite.db"
 
 currentConnection=None
 
@@ -9,17 +9,35 @@ sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     dataBaseRef text NOT NULL PRIMARY KEY,
                                     is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
                                     type TEXT CHECK( type IN ('Tabular','Image','Video','Text','DB','Misc') ) DEFAULT NULL,
-                                    Tab_corr REAL NULL DEFAULT NULL,
-                                    Tab_interaction REAL NULL DEFAULT NULL,
-                                    Tab_features_total INTEGER NULL DEFAULT NULL,
-                                    Tab_cat_features INTEGER NULL DEFAULT NULL,
-                                    Tab_num_features INTEGER NULL DEFAULT NULL
+                                    tab_corr REAL NULL DEFAULT NULL,
+                                    tab_interaction REAL NULL DEFAULT NULL,
+                                    tab_features_total INTEGER NULL DEFAULT NULL,
+                                    tab_cat_features INTEGER NULL DEFAULT NULL,
+                                    tab_num_features INTEGER NULL DEFAULT NULL
+                                    tab_goal text CHECK (goal IN ('classification','regression','misc')) DEFAULT NULL,
+                                ); """
+
+sql_create_kernel_info = """ CREATE TABLE IF NOT EXISTS kernel_info (
+                                    kernelRef text NOT NULL PRIMARY KEY,
+                                    dataBaseRef text NOT NULL PRIMARY KEY,
+                                    hasBlackBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
+                                    hasGlassBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
+                                    Performance REAL NULL DEFAULT NULL,
+                                    CONSTRAINT fk_dataBaseRef
+                                        FOREIGN KEY (dataBaseRef)
+                                        REFERENCES dataset_info (dataBaseRef)
+                                ); """
+
+sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_info (
+                                    kernelRef text NOT NULL PRIMARY KEY,
+                                    hasBlackBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
+                                    CONSTRAINT fk_kernelRef
+                                        FOREIGN KEY (kernelRef)
+                                        REFERENCES kernel_info (kernelRef)
                                 ); """
 def insertRowOrIncrementKernelCount(dataSetRef,is_competition):
-    query="INSERT INTO dataset_info (dataBaseRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
-    print(query)
+    query="INSERT OR IGNORE INTO dataset_info (dataBaseRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
     execute_query(query)
-
 
 def execute_many(query,data,connection=None):
     global currentConnection
@@ -38,7 +56,6 @@ def execute_many(query,data,connection=None):
 def execute_query(query,connection=None):
     global currentConnection
     connectionToUse = currentConnection or connection
-    print(connectionToUse)
     if connectionToUse is None:
         raise Exception("Initialize DB-connection before using it!")
     cursor = connectionToUse.cursor()
@@ -66,6 +83,8 @@ def initConnection():
     try:
         currentConnection = connect(databasePath)
         execute_query(sql_create_dataset_info)
+        execute_query(sql_create_kernel_info)
+        execute_query(sql_create_xai_methods)
     except Error as e:
         print(e)
 

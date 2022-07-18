@@ -12,6 +12,21 @@ class KernelLanguage(Enum):
 
 kernelListPageSize=100
 
+explainableAITermesDict = {
+  "PH_ALE": ["import.*ALE","import.*plot_ale"],
+  "PH_PFI": ["eli5\.show_weights.*","xai.feature_importance"],
+#    "IM": ["sklearn.ensemble"],
+  "PH_LIME": ["import.*lime","from\slime\simport","skater.core.local_interpretation.lime."],
+  "PH_PDP": ["from pdpbox"], 
+  "IM_FI": ["lgbm.plot_importance","xgb.plot_importance"],
+  "PH_SHAP": ["shap.","from alibi.explainers import KernelShap"],
+  "DABL": ["dabl."],
+  "PH_GLOBAL_SURR": ['skater.model'],
+  "IM_RULELIST" : ["skater.core.global_interpretation.interpretable_models.brlc"],
+  "DASHBOARD" : ["from explainerdashboard"],
+  "IM_GAM" :["from pygam import"]
+}
+
 testKernelsRefs={KaggleEntityType.DATASET: {},
                  KaggleEntityType.COMPETITION:{
                   'titanic':'vbmokin/merging-fe-prediction-xgb-lgb-logr-linr',
@@ -25,8 +40,8 @@ testKernelsRefs={KaggleEntityType.DATASET: {},
 parentEntityPathStrList=['datasets','competitions','none']
 
 #filePath= '/content/drive/MyDrive/Colab'
-filePath="C:\\Users\\garyee\\gDrive\\Colab"
-basePath= filePath+'/Kaggle/kernels/'
+filePath="C:\\Users\\garyee\\gDrive\\Colab\\Kaggle\\"
+basePath= filePath+'kernels/'
 basePathPerDataSet= basePath+'datasets'
 basePathPerCompetitions= basePath+'competitions'
 basePathNone= basePath+'none'
