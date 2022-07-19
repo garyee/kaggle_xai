@@ -6,29 +6,30 @@ databasePath = filePath+"kaggleSqlite.db"
 currentConnection=None
 
 sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
-                                    dataBaseRef text NOT NULL PRIMARY KEY,
+                                    dataSetRef text NOT NULL PRIMARY KEY,
                                     is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
                                     type TEXT CHECK( type IN ('Tabular','Image','Video','Text','DB','Time Series','Misc') ) DEFAULT NULL,
                                     tab_corr REAL NULL DEFAULT NULL,
                                     tab_interaction REAL NULL DEFAULT NULL,
                                     tab_features_total INTEGER NULL DEFAULT NULL,
                                     tab_cat_features INTEGER NULL DEFAULT NULL,
-                                    tab_num_features INTEGER NULL DEFAULT NULL
-                                    tab_goal text CHECK (goal IN ('classification','regression','misc')) DEFAULT NULL,
+                                    tab_num_features INTEGER NULL DEFAULT NULL,
+                                    tab_goal text CHECK (tab_goal IN ('classification','regression','misc')) DEFAULT NULL
                                 ); """
 
 sql_create_kernel_info = """ CREATE TABLE IF NOT EXISTS kernel_info (
                                     kernelRef text NOT NULL PRIMARY KEY,
-                                    dataBaseRef text NOT NULL PRIMARY KEY,
+                                    dataSetRef text NOT NULL,
                                     hasBlackBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
                                     hasGlassBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
                                     Performance REAL NULL DEFAULT NULL,
-                                    CONSTRAINT fk_dataBaseRef
-                                        FOREIGN KEY (dataBaseRef)
-                                        REFERENCES dataset_info (dataBaseRef)
+                                    CONSTRAINT fk_dataSetRef
+                                        FOREIGN KEY (dataSetRef)
+                                        REFERENCES dataset_info (dataSetRef)
                                 ); """
 
-sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_info (
+sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_xai (
+                                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                                     kernelRef text NOT NULL PRIMARY KEY,
                                     hasBlackBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
                                     CONSTRAINT fk_kernelRef
@@ -36,14 +37,14 @@ sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_info (
                                         REFERENCES kernel_info (kernelRef)
                                 ); """
 def updateEntityTypeAndGoal(data):
-    sqlite_update_with_dict('dataset_info', data,'dataBaseRef')
+    sqlite_update_with_dict('dataset_info', data,'dataSetRef')
 
 def insertDataBase(dataSetRef,is_competition):
-    query="INSERT OR IGNORE INTO dataset_info (dataBaseRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
+    query="INSERT OR IGNORE INTO dataset_info (dataSetRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
     execute_write_query(query)
 
 def getAllEntityRefs():
-    return execute_read_query("SELECT dataBaseRef,is_competition FROM dataset_info")
+    return execute_read_query("SELECT dataSetRef,is_competition FROM dataset_info")
 
 def sqlite_update_with_dict(table, data,primaryKeyName, connection=None):
     global currentConnection
@@ -62,7 +63,7 @@ def sqlite_update_with_dict(table, data,primaryKeyName, connection=None):
     except Error as e:
         print(f"The error '{e}' occurred")
 
-def execute_many(query,data,connection=None):
+def execute_many(query,data,connection=None,silent=True):
     global currentConnection
     connectionToUse = currentConnection or connection
     if connectionToUse is None:
@@ -71,12 +72,13 @@ def execute_many(query,data,connection=None):
     try:
         cursor.executemany(query,data)
         currentConnection.commit()
-        print("Query executed successfully")
+        if silent==False:
+            print("Query executed successfully")
     except Error as e:
         print(f"The error '{e}' occurred")
 
 
-def execute_write_query(query,connection=None):
+def execute_write_query(query,connection=None,silent=True):
     global currentConnection
     connectionToUse = currentConnection or connection
     if connectionToUse is None:
@@ -85,7 +87,8 @@ def execute_write_query(query,connection=None):
     try:
         cursor.execute(query)
         connectionToUse.commit()
-        print("Query executed successfully")
+        if silent==False:
+            print("Query executed successfully")
     except Error as e:
         print(f"The error '{e}' occurred")
 

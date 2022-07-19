@@ -59,8 +59,8 @@ def getKernelPath(kernelRef,middleEntityRef='',parentEntityType=KaggleEntityType
     os.mkdir(pathStump)
   return pathStump+kernelRefDirName+'/'
 
-def getDataSetPath(dataBaseRef):
-  middleRefDirName=getPathNameFromKaggleRef(dataBaseRef)
+def getDataSetPath(dataSetRef):
+  middleRefDirName=getPathNameFromKaggleRef(dataSetRef)
   pathStump=getKaggleEntityBasePath(KaggleEntityType.DATASET)+'/'+middleRefDirName+'/'
   if(not os.path.exists(pathStump)):
     os.mkdir(pathStump)

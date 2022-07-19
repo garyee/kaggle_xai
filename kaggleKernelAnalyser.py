@@ -27,11 +27,11 @@ def anaylseKernels(filePaths):
 
 def analyseOneKernelFile(filePath):
     matches={}
-    with open(filePath) as f:
+    with open(filePath, encoding='utf-8') as f:
         kernelCode={}
         try:
             kernelCode = json.load(f)
-        except ValueError:
+        except ValueError as e:
             print('Decoding JSON has failed for: '+filePath)
         language=KernelLanguage.NONE
 

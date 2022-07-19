@@ -56,9 +56,9 @@ if(not os.path.exists(basePathNone)):
 def getKaggleEntityString(entity,multiple=False):
   if entity==KaggleEntityType.DATASET:
     if multiple:
-      return 'databases'
+      return 'datasets'
     else:
-      return 'database'
+      return 'dataset'
   elif entity==KaggleEntityType.COMPETITION:
     if multiple:
       return 'competitions'
@@ -67,7 +67,7 @@ def getKaggleEntityString(entity,multiple=False):
   return ''
 
 def getKaggleEntityTypeFromString(entityStr):
-  if entityStr=='databases' or entityStr=='database':
+  if entityStr=='datasets' or entityStr=='dataset':
     return KaggleEntityType.DATASET
   if entityStr=='competitions' or entityStr=='competition':
       return KaggleEntityType.COMPETITION

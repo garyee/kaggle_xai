@@ -6,7 +6,7 @@ from kaggleEntityFileListAnalyser import analyseEntityFileList
 def analyseAllAndSetType(dataSetList):
     database.initConnection()
     for entityDict in dataSetList:
-        analyseOneEntity(entityDict['dataBaseRef'],database.getEntityTypeFromDBentry(entityDict['is_competition']))
+        analyseOneEntity(entityDict[0],database.getEntityTypeFromDBentry(entityDict[1]))
     database.closeConnection()
 
 def analyseOneEntity(entityRef,entityType):
