@@ -2,10 +2,10 @@ from kaggleDataSetTypeAnalyser import analyseAllAndSetType
 from kaggleKernelAnalyser import analyseTestKernels,analyseAllKernels
 import database
 
-analyseAllKernels()
+# analyseAllKernels()
 # analyseTestKernels()
 
-# database.initConnection()
-# dataRefList=database.getAllEntityRefs()
-# database.closeConnection()
-# analyseAllAndSetType(dataRefList)
+database.initConnection()
+dataRefList=database.getAllEntityRefs()
+database.closeConnection()
+analyseAllAndSetType(dataRefList)

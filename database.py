@@ -8,7 +8,7 @@ currentConnection=None
 sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     dataSetRef text NOT NULL PRIMARY KEY,
                                     is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
-                                    type TEXT CHECK( type IN ('Tabular','Image','Video','Text','DB','Time Series','Misc') ) DEFAULT NULL,
+                                    type TEXT CHECK( type IN ('Tabular','Image','Video','Text','Time Series','Misc') ) DEFAULT NULL,
                                     tab_corr REAL NULL DEFAULT NULL,
                                     tab_interaction REAL NULL DEFAULT NULL,
                                     tab_features_total INTEGER NULL DEFAULT NULL,
@@ -37,7 +37,8 @@ sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_xai (
                                         REFERENCES kernel_info (kernelRef)
                                 ); """
 def updateEntityTypeAndGoal(data):
-    sqlite_update_with_dict('dataset_info', data,'dataSetRef')
+    if 'dataSetRef' in data and len(data.keys())>1:
+        sqlite_update_with_dict('dataset_info', data,'dataSetRef')
 
 def insertDataBase(dataSetRef,is_competition):
     query="INSERT OR IGNORE INTO dataset_info (dataSetRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
@@ -126,7 +127,8 @@ def getEntityTypeFromDBentry(dbentry):
 def initConnection():
     global currentConnection
     try:
-        currentConnection = connect(databasePath)
+        if currentConnection==None :
+            currentConnection = connect(databasePath)
         execute_write_query(sql_create_dataset_info)
         execute_write_query(sql_create_kernel_info)
         execute_write_query(sql_create_xai_methods)
@@ -137,4 +139,5 @@ def closeConnection():
     global currentConnection
     if currentConnection:
         currentConnection.close()
+        currentConnection=None
 

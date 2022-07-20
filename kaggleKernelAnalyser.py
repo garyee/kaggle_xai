@@ -27,6 +27,10 @@ def anaylseKernels(filePaths):
 
 def analyseOneKernelFile(filePath):
     matches={}
+    if os.stat(filePath).st_size == 0:
+        os.remove(filePath)
+        print(filePath+' was empty and thus removed!')
+        return matches
     with open(filePath, encoding='utf-8') as f:
         kernelCode={}
         try:
@@ -46,6 +50,8 @@ def analyseOneKernelFile(filePath):
                 matches=merge_two_dicts(matches, XaiAnalyser.analyse(cell,getAllInfoFromKernelPath(filePath)))
         return matches
 
+# analyseOneKernelFile('C:/Users/garyee/gDrive/Colab/Kaggle/kernels/datasets/kaggle_____meta-kaggle/benhamner_____predicting-which-scripts-get-votes/predicting-which-scripts-get-votes.ipynb')
+
 def getTestKernelFiles():
     matches=[]
     for entityType,kernelInfoDict in testKernelsRefs.items():
@@ -60,7 +66,7 @@ def getAllFilePaths(directory=basePath):
     for subdir, dirs, files in os.walk(directory):
         for file in files:
           if(file.endswith('ipynb')):
-            matches.append(os.path.join(subdir, file).replace("\\\\","/"))
+            matches.append(os.path.join(subdir, file).replace("\\\\","/").replace("\\","/"))
     return matches
 
 def merge_two_dicts(x, y):

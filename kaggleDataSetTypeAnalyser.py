@@ -16,8 +16,9 @@ def analyseOneEntity(entityRef,entityType):
         if entityType==KaggleEntityType.DATASET:
             analyseDataSetMetaData(entityRef,resultingRow)
         if 'type' not in resultingRow:
-            analyseEntityFileList(entityRef,resultingRow)
-        database.updateEntityTypeAndGoal(resultingRow)
+            analyseEntityFileList(entityRef,resultingRow,entityType)
+        if 'type' in resultingRow:
+            database.updateEntityTypeAndGoal(resultingRow)
         #DownloadFiles
         #AnalyseMetadata-keywords
         

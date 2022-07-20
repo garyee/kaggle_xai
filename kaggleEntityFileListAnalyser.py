@@ -13,6 +13,8 @@ fileTypeFileExtensions = {
     'Misc':[]
 }
 
+ignoreExtensions=['tfrec']
+
 def analyseEntityFileList(entityRef,resDict,entityType=KaggleEntityType.DATASET):
   command='kaggle datasets files '+entityRef
   if entityType==KaggleEntityType.COMPETITION:
@@ -25,20 +27,22 @@ def analyseEntityFileList(entityRef,resDict,entityType=KaggleEntityType.DATASET)
     fileSize=parseFileSize(row['size'])
     overAllFileSize+=fileSize
     _, file_extension = os.path.splitext(filename)
-    for fileType, extensionArray in fileTypeFileExtensions.items():
-        if file_extension.lstrip('.').lower() in extensionArray:
-            if fileType not in countPerType:
-                countPerType[fileType]=fileSize
-            else:
-                countPerType[fileType]+=fileSize
-    maxType=None
-    maxFileSizeSum=0
-    for fileTypeCounted, countedFileSizePerType in countPerType.items():
-        if(countedFileSizePerType/overAllFileSize>maxFileSizeSum):
-            maxType=fileTypeCounted
-            maxFileSizeSum=countedFileSizePerType/overAllFileSize
-    if maxType is not None:
-        resDict['type']=maxType
+    file_extension=file_extension.lstrip('.').lower();
+    if file_extension not in ignoreExtensions:
+        for fileType, extensionArray in fileTypeFileExtensions.items():
+            if file_extension in extensionArray:
+                if fileType not in countPerType:
+                    countPerType[fileType]=fileSize
+                else:
+                    countPerType[fileType]+=fileSize
+        maxType=None
+        maxFileSizeSum=0
+        for fileTypeCounted, countedFileSizePerType in countPerType.items():
+            if(countedFileSizePerType/overAllFileSize>maxFileSizeSum):
+                maxType=fileTypeCounted
+                maxFileSizeSum=countedFileSizePerType/overAllFileSize
+        if maxType is not None:
+            resDict['type']=maxType
     
 def parseFileSize(fileSizeStr):
     units = {"B": 1, "KB": 2**10, "MB": 2**20, "GB": 2**30, "TB": 2**40 ,
