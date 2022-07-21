@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import database
 from kaggleEnums import KaggleEntityType
 from kaggleFileMetaDataAnalyser import analyseDataSetMetaData
@@ -5,7 +6,7 @@ from kaggleEntityFileListAnalyser import analyseEntityFileList
 
 def analyseAllAndSetType(dataSetList):
     database.initConnection()
-    for entityDict in dataSetList:
+    for entityDict in tqdm(dataSetList):
         analyseOneEntity(entityDict[0],database.getEntityTypeFromDBentry(entityDict[1]))
     database.closeConnection()
 

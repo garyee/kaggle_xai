@@ -30,12 +30,27 @@ sql_create_kernel_info = """ CREATE TABLE IF NOT EXISTS kernel_info (
 
 sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_xai (
                                     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                                    kernelRef text NOT NULL PRIMARY KEY,
+                                    kernelRef text NOT NULL,
                                     hasBlackBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
                                     CONSTRAINT fk_kernelRef
                                         FOREIGN KEY (kernelRef)
                                         REFERENCES kernel_info (kernelRef)
                                 ); """
+sql_create_dataset_blacklist = """ CREATE TABLE IF NOT EXISTS dataset_blacklist (
+                                    dataSetRef text NOT NULL PRIMARY KEY,
+                                    is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
+                                    reason text NULL DEFAULT NULL
+                                ); """
+
+def shiftDataSetToBlackList(dataSetRef,entityType,reason):
+    isCompetition=getIsCompetitionfromEntityType(entityType)
+    createCommand="INSERT OR IGNORE INTO dataset_blacklist (dataSetRef,is_competition,reason) VALUES ('"+dataSetRef+"', '"+str(isCompetition)+"','"+reason+"');"
+    execute_write_query(createCommand)
+    deleteCommand="DELETE FROM dataset_info WHERE dataSetRef='"+dataSetRef+"';"
+    execute_write_query(deleteCommand)
+    deleteCommand="DELETE FROM dataset_info WHERE dataSetRef='"+dataSetRef+"';"
+    execute_write_query(deleteCommand)
+
 def updateEntityTypeAndGoal(data):
     if 'dataSetRef' in data and len(data.keys())>1:
         sqlite_update_with_dict('dataset_info', data,'dataSetRef')
@@ -113,6 +128,11 @@ def getEntityTypeFromDBentry(dbentry):
         return KaggleEntityType.DATASET
     return KaggleEntityType.NONE
 
+def getIsCompetitionfromEntityType(type):
+    if(type==KaggleEntityType.COMPETITION):
+        return 1
+    return 0
+
 # def create_tables(db_file):
 #     conn = None
 #     try:
@@ -132,6 +152,7 @@ def initConnection():
         execute_write_query(sql_create_dataset_info)
         execute_write_query(sql_create_kernel_info)
         execute_write_query(sql_create_xai_methods)
+        execute_write_query(sql_create_dataset_blacklist)
     except Error as e:
         print(e)
 

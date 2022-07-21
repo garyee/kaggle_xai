@@ -93,7 +93,7 @@ def getAllInfoFromKernelPath(filePath):
     kernelFileName=pathPartsList[2]
     parentEntityRef=None
   elif len(pathPartsList)==4:
-    parentEntityRef=pathPartsList[1]
+    parentEntityRef=getKaggleRefFromFilePathPartStr(pathPartsList[1])
     entityRef=getKaggleRefFromFilePathPartStr(pathPartsList[2])
     kernelFileName=pathPartsList[3]
   else:
@@ -116,3 +116,27 @@ def getPathNameFromKaggleRef(kaggleRef):
 
 def getKaggleRefFromFilePathPartStr(filePathPart):
   return filePathPart.replace('_____','/')
+
+class DataSetTypes(Enum):
+  TABULAR = 'Tabluar'
+  IMAGE = 'Image'
+  VIDEO = 'Video'
+  TEXT = 'Text'
+  TIME_SERIES = 'Time series'
+  MISC = 'Misc'
+
+  def getExtensions(self=None):
+    extensionArray= {
+      DataSetTypes.TABULAR: ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite'],
+      DataSetTypes.IMAGE:['jpg','gif','png'],
+      DataSetTypes.VIDEO:['mpg','mp4','mpeg'],
+      DataSetTypes.TEXT:[],
+      DataSetTypes.TIME_SERIES:[],
+      DataSetTypes.MISC:['tfrec','txt','pdf','sh','py','md','pkl','r'],
+    }
+    if(self is None):
+      return extensionArray
+    return extensionArray[self]
+
+  def __str__(self):
+        return str(self.value)
