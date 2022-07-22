@@ -6,26 +6,23 @@ class KaggleEntityType(Enum):
   COMPETITION = 2
   NONE = 3
 
+def getEntityTypeFromString(str):
+    if(str==1):
+        return KaggleEntityType.COMPETITION
+    elif(str==0):
+        return KaggleEntityType.DATASET
+    return KaggleEntityType.NONE
+
+def getIsCompetitionfromEntityType(type):
+    if(type==KaggleEntityType.COMPETITION):
+        return 1
+    return 0
+
 class KernelLanguage(Enum):
   PYTHON = 1
   NONE = 2
 
 kernelListPageSize=100
-
-explainableAITermesDict = {
-  "PH_ALE": ["import.*ALE","import.*plot_ale"],
-  "PH_PFI": ["eli5\.show_weights.*","xai.feature_importance"],
-#    "IM": ["sklearn.ensemble"],
-  "PH_LIME": ["import.*lime","from\slime\simport","skater.core.local_interpretation.lime."],
-  "PH_PDP": ["from pdpbox"], 
-  "IM_FI": ["lgbm.plot_importance","xgb.plot_importance"],
-  "PH_SHAP": ["shap.","from alibi.explainers import KernelShap"],
-  "DABL": ["dabl."],
-  "PH_GLOBAL_SURR": ['skater.model'],
-  "IM_RULELIST" : ["skater.core.global_interpretation.interpretable_models.brlc"],
-  "DASHBOARD" : ["from explainerdashboard"],
-  "IM_GAM" :["from pygam import"]
-}
 
 testKernelsRefs={KaggleEntityType.DATASET: {},
                  KaggleEntityType.COMPETITION:{
@@ -118,12 +115,15 @@ def getKaggleRefFromFilePathPartStr(filePathPart):
   return filePathPart.replace('_____','/')
 
 class DataSetTypes(Enum):
-  TABULAR = 'Tabluar'
+  TABULAR = 'Tabular'
   IMAGE = 'Image'
   VIDEO = 'Video'
   TEXT = 'Text'
   TIME_SERIES = 'Time series'
   MISC = 'Misc'
+
+  def getAllKnownExtensions():
+    return ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite','jpg','gif','png','mpg','mp4','mpeg','tfrec','txt','pdf','sh','py','md','pkl','r','zip','gz','readme','bz2','m','h5']
 
   def getExtensions(self=None):
     extensionArray= {
@@ -132,11 +132,70 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:['mpg','mp4','mpeg'],
       DataSetTypes.TEXT:[],
       DataSetTypes.TIME_SERIES:[],
-      DataSetTypes.MISC:['tfrec','txt','pdf','sh','py','md','pkl','r'],
+      DataSetTypes.MISC:[],
     }
     if(self is None):
       return extensionArray
     return extensionArray[self]
 
-  def __str__(self):
-        return str(self.value)
+  def getSourceCodeRegExes(self=None):
+    regExArray= {
+      DataSetTypes.TABULAR: 
+        [],
+      DataSetTypes.IMAGE:
+        [],
+      DataSetTypes.VIDEO:
+        [],
+      DataSetTypes.TEXT:[
+        'from nltk',
+        'import nltk',
+        'import spacy',
+        'from spacy',
+        'feature_extraction.text',
+        'sklearn.feature_extraction.text',
+        'Tokenizer',
+        'Vectorizer',
+      ],
+      DataSetTypes.TIME_SERIES:[
+        '.to_datetime(',
+        'date',
+        'time',
+        'time[^a-zA-Z0-9]{1}serie[s]*',
+        'to_period',
+        'statsmodels.tsa',
+        'from tsfresh',
+        'import tsfresh',
+        'from darts',
+        'import darts',
+        'from kats',
+        'import kats',
+        'from greykite',
+        'import greykite',
+        'from autots',
+        'import autots',
+      ],
+      DataSetTypes.MISC:
+        [],
+    }
+    if(self is None):
+      return regExArray
+    return regExArray[self]
+
+  def getMetaDataKeywordRegexes(self=None):
+    #See DB Fields & order matters:
+    regExArray= {
+      DataSetTypes.TABULAR:[r'tabular'],
+      DataSetTypes.IMAGE:[r'computer vision',r'image'],
+      DataSetTypes.VIDEO:[r'^video$'],
+      DataSetTypes.TEXT:[r'nlp',r'linguistics'],
+      DataSetTypes.TIME_SERIES:[r'time series'],
+      DataSetTypes.MISC:[],
+    }
+    if(self is None):
+      return regExArray
+    return regExArray[self]
+
+def __str__(self):
+      return str(self.value)
+
+metaDataGoal=['regression','classification']

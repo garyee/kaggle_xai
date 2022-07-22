@@ -1,5 +1,5 @@
 from sqlite3 import connect, Error
-from kaggleEnums import KaggleEntityType, filePath
+from kaggleEnums import KaggleEntityType, filePath, getIsCompetitionfromEntityType
 
 databasePath = filePath+"kaggleSqlite.db"
 
@@ -7,14 +7,14 @@ currentConnection=None
 
 sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     dataSetRef text NOT NULL PRIMARY KEY,
-                                    is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
-                                    type TEXT CHECK( type IN ('Tabular','Image','Video','Text','Time Series','Misc') ) DEFAULT NULL,
+                                    is_competition BOOLEAN NOT NULL constraint enum_is_comp CHECK (is_competition IN (0, 1)) DEFAULT 0,
+                                    type TEXT constraint enum_type CHECK( type IN ('Tabular','Image','Video','Text','Time Series','Misc') ) DEFAULT NULL,
                                     tab_corr REAL NULL DEFAULT NULL,
                                     tab_interaction REAL NULL DEFAULT NULL,
                                     tab_features_total INTEGER NULL DEFAULT NULL,
                                     tab_cat_features INTEGER NULL DEFAULT NULL,
                                     tab_num_features INTEGER NULL DEFAULT NULL,
-                                    tab_goal text CHECK (tab_goal IN ('classification','regression','misc')) DEFAULT NULL
+                                    tab_goal text constraint enum_tab_goal CHECK (tab_goal IN ('classification','regression','misc')) DEFAULT NULL
                                 ); """
 
 sql_create_kernel_info = """ CREATE TABLE IF NOT EXISTS kernel_info (
@@ -26,6 +26,7 @@ sql_create_kernel_info = """ CREATE TABLE IF NOT EXISTS kernel_info (
                                     CONSTRAINT fk_dataSetRef
                                         FOREIGN KEY (dataSetRef)
                                         REFERENCES dataset_info (dataSetRef)
+                                        ON DELETE CASCADE
                                 ); """
 
 sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_xai (
@@ -35,6 +36,7 @@ sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_xai (
                                     CONSTRAINT fk_kernelRef
                                         FOREIGN KEY (kernelRef)
                                         REFERENCES kernel_info (kernelRef)
+                                        ON DELETE CASCADE
                                 ); """
 sql_create_dataset_blacklist = """ CREATE TABLE IF NOT EXISTS dataset_blacklist (
                                     dataSetRef text NOT NULL PRIMARY KEY,
@@ -48,12 +50,6 @@ def shiftDataSetToBlackList(dataSetRef,entityType,reason):
     execute_write_query(createCommand)
     deleteCommand="DELETE FROM dataset_info WHERE dataSetRef='"+dataSetRef+"';"
     execute_write_query(deleteCommand)
-    deleteCommand="DELETE FROM dataset_info WHERE dataSetRef='"+dataSetRef+"';"
-    execute_write_query(deleteCommand)
-
-def updateEntityTypeAndGoal(data):
-    if 'dataSetRef' in data and len(data.keys())>1:
-        sqlite_update_with_dict('dataset_info', data,'dataSetRef')
 
 def insertDataBase(dataSetRef,is_competition):
     query="INSERT OR IGNORE INTO dataset_info (dataSetRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
@@ -62,7 +58,11 @@ def insertDataBase(dataSetRef,is_competition):
 def getAllEntityRefs():
     return execute_read_query("SELECT dataSetRef,is_competition FROM dataset_info")
 
-def sqlite_update_with_dict(table, data,primaryKeyName, connection=None):
+def updateDataSetToDB(data,primaryKey='dataSetRef'):
+    if primaryKey in data and len(data.keys())>1:
+        sqlite_update_with_dict('dataset_info',primaryKey, data)
+
+def sqlite_update_with_dict(table,primaryKeyName, data, connection=None):
     global currentConnection
     connectionToUse = currentConnection or connection
     if connectionToUse is None:
@@ -120,18 +120,6 @@ def execute_read_query(query,connection=None):
     except Error as e:
         print(f"The error '{e}' occurred")
     return []
-
-def getEntityTypeFromDBentry(dbentry):
-    if(dbentry==1):
-        return KaggleEntityType.COMPETITION
-    elif(dbentry==0):
-        return KaggleEntityType.DATASET
-    return KaggleEntityType.NONE
-
-def getIsCompetitionfromEntityType(type):
-    if(type==KaggleEntityType.COMPETITION):
-        return 1
-    return 0
 
 # def create_tables(db_file):
 #     conn = None

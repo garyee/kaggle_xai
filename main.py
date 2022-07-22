@@ -1,11 +1,9 @@
-from kaggleDataSetTypeAnalyser import analyseAllAndSetType
-from kaggleKernelAnalyser import analyseTestKernels,analyseAllKernels
-import database
+from KaggleDataSetAnalysers.DataSetTypeFileListAnalyser import DataSetTypeFileListAnalyser
+from KaggleDataSetAnalysers.DataSetTypeMetaDataAnalyser import DataSetTypeMetaDataAnalyser
+from kaggleKernelAnalyser import analyseAllKernels
 
-# analyseAllKernels()
-# analyseTestKernels()
+def fillDatabase():
+    analyseAllKernels(dataSetAnalysers=[DataSetTypeMetaDataAnalyser])
 
-database.initConnection()
-dataRefList=database.getAllEntityRefs()
-database.closeConnection()
-analyseAllAndSetType(dataRefList)
+
+fillDatabase()
