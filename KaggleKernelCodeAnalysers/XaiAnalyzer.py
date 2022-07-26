@@ -14,7 +14,10 @@ class XaiAnalyser(KaggleKernelCodeAnalyzer):
   "PH_GLOBAL_SURR": ['skater.model'],
   "IM_RULELIST" : ["skater.core.global_interpretation.interpretable_models.brlc"],
   "DASHBOARD" : ["from explainerdashboard"],
-  "IM_GAM" :["from pygam import"]
+  "IM_GAM" :["from pygam import"],
+  #functional Data analysis - e.g. anova
+  "FDA" :["import skfda"],
+  "Anova": ["from skfda.inference.anova","from pyfanova.fanova", "from fanova"]
 }
 
 #   def getHeader():

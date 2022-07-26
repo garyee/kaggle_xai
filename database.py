@@ -55,12 +55,30 @@ def insertDataBase(dataSetRef,is_competition):
     query="INSERT OR IGNORE INTO dataset_info (dataSetRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
     execute_write_query(query)
 
+def insertKernel(dataDict):
+     sqlite_Insert_with_dict('kernel_info',dataDict)
+
 def getAllEntityRefs():
     return execute_read_query("SELECT dataSetRef,is_competition FROM dataset_info")
 
 def updateDataSetToDB(data,primaryKey='dataSetRef'):
     if primaryKey in data and len(data.keys())>1:
         sqlite_update_with_dict('dataset_info',primaryKey, data)
+
+def sqlite_Insert_with_dict(table, data, connection=None):
+    global currentConnection
+    connectionToUse = currentConnection or connection
+    if connectionToUse is None:
+        raise Exception("Initialize DB-connection before using it!")
+    try:
+        cursor = currentConnection.cursor()
+
+        columns = ', '.join(data.keys())
+        placeholders = ', '.join('?' * len(data))
+        query = "INSERT OR IGNORE INTO "+table+" ({}) VALUES ({})".format(columns, placeholders)
+        cursor.execute(query, list(data.values()) )
+    except Error as e:
+        print(f"The error '{e}' occurred")
 
 def sqlite_update_with_dict(table,primaryKeyName, data, connection=None):
     global currentConnection

@@ -1,9 +1,9 @@
 from KaggleDataSetAnalysers.DataSetTypeFileListAnalyser import DataSetTypeFileListAnalyser
 from KaggleDataSetAnalysers.DataSetTypeMetaDataAnalyser import DataSetTypeMetaDataAnalyser
+from KaggleKernelCodeAnalysers.DataSetTypeAnalyzer import DataSetTypeAnalyzer
 from kaggleKernelAnalyser import analyseAllKernels
 
 def fillDatabase():
-    analyseAllKernels(dataSetAnalysers=[DataSetTypeMetaDataAnalyser])
-
+    analyseAllKernels(dataSetAnalysers=[DataSetTypeFileListAnalyser,DataSetTypeMetaDataAnalyser],kernelAnalysers=[DataSetTypeAnalyzer])
 
 fillDatabase()

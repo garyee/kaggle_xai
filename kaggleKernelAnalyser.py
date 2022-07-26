@@ -39,16 +39,25 @@ def analyseTestKernels():
     return anaylseKernels(getTestKernelFiles())
 
 def analyseAllKernels(dataSetAnalysers=[],kernelAnalysers = []):
-    return anaylseKernels(getAllFilePaths(),dataSetAnalysers,kernelAnalysers)
+    return anaylseKernels(getAllFilePaths(),intanciacteAnalysers(dataSetAnalysers,KaggleDataSetAnalyser),intanciacteAnalysers(kernelAnalysers,KaggleKernelCodeAnalyzer))
 
-def anaylseKernels(filePaths,dataSetAnalysers=[],kernelAnalysers = []):
+def intanciacteAnalysers(analysers,baseClass):
+    returnArr=[]
+    for analyser in analysers:
+        if issubclass(analyser, baseClass ):
+            returnArr.append(analyser())
+    return returnArr
+
+def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstances = []):
     database.initConnection()
     lastDataSetRef=None
     resultDataSetDict={}
     for filePath in tqdm(filePaths):
         parentEntityType,parentEntityRef,entityRef,kernelFileName = getAllInfoFromKernelPath(filePath)
         #Insert DB into dataset_info
-        if(parentEntityRef!=lastDataSetRef):
+        currentDataSetChanged=parentEntityRef!=lastDataSetRef
+        currentDataSetChangedAndIsNoneForFirst=None if (lastDataSetRef is None) else currentDataSetChanged
+        if(currentDataSetChanged):
             # print('INIT new DS: '+parentEntityRef)
             # update DS db with dict
             if(lastDataSetRef is not None and 'dataSetRef' in resultDataSetDict and len(resultDataSetDict.keys())>2):
@@ -58,20 +67,22 @@ def anaylseKernels(filePaths,dataSetAnalysers=[],kernelAnalysers = []):
             }
             # one time per DS analyse and update Dict
             database.insertDataBase(parentEntityRef,getIsCompetitionfromEntityType(parentEntityType))
-            analyseDataSet(parentEntityRef,parentEntityType,resultDataSetDict,dataSetAnalysers)
+            analyseDataSet(parentEntityRef,parentEntityType,resultDataSetDict,dataSetAnalysersInstances)
             lastDataSetRef=parentEntityRef
         # insert KernelDB row directly and update DS dict if needed
-        # analyseKernelFile(filePath,entityRef,kernelAnalysers)
+        resultKernelDict={
+            'dataSetRef':parentEntityRef,'kernelRef':entityRef
+        }
+        analyseKernelFile(filePath,currentDataSetChangedAndIsNoneForFirst,resultKernelDict,resultDataSetDict,kernelAnalysersInstances)
+        database.insertKernel(resultKernelDict)
     database.closeConnection()
 
-def analyseDataSet(dataSetRef,dataSetType,resultDataSetDict,dataSetAnalysers=[]):
+def analyseDataSet(dataSetRef,dataSetType,resultDataSetDict,dataSetAnalysersInstances=[]):
     if(dataSetType!=KaggleEntityType.NONE):
-        for dataSetAnalyser in dataSetAnalysers:
-            if issubclass(dataSetAnalyser, KaggleDataSetAnalyser ):
-                analyser=dataSetAnalyser()
-                analyser.analyse(dataSetRef,dataSetType,resultDataSetDict)
+        for dataSetAnalyser in dataSetAnalysersInstances:
+            dataSetAnalyser.analyse(dataSetRef,dataSetType,resultDataSetDict)
     
-def analyseKernelFile(filePath,entityRef,analysers = []):
+def analyseKernelFile(filePath,currentDataSetChanged,resultKernelDict,resultDataSetDict,kernelAnalysersInstances = []):
     if os.stat(filePath).st_size == 0:
         os.remove(filePath)
         print(filePath+' was empty and thus removed!')
@@ -90,12 +101,9 @@ def analyseKernelFile(filePath,entityRef,analysers = []):
         #       language=KernelLanguage.PYTHON
         #   elif hasattr(kernelCode['metadata']['kernelspec'], 'name') and 'python' in kernelCode['metadata']['kernelspec']['name']:
         #     language=KernelLanguage.PYTHON
-        if hasattr(kernelCode,'cells'):
-            for analyser in analysers:
-                if issubclass(analyser, KaggleKernelCodeAnalyzer ):
-                    analyser=dataSetAnalyser()
-                    analyser.analyse(dataSetRef,dataSetType,resultDataSetDict)
-                    # analyser.analyse(kernelCode['cells'],resultDict)
+        if 'cells' in kernelCode:
+            for kernelAnalyser in kernelAnalysersInstances:
+                    kernelAnalyser.analyse(kernelCode['cells'],currentDataSetChanged,resultKernelDict,resultDataSetDict)
 
 
 # analyseOneKernelFile('C:/Users/garyee/gDrive/Colab/Kaggle/kernels/datasets/kaggle_____meta-kaggle/benhamner_____predicting-which-scripts-get-votes/predicting-which-scripts-get-votes.ipynb')

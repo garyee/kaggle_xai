@@ -18,9 +18,9 @@ class DataSetTypeMetaDataAnalyser(KaggleDataSetAnalyser):
         if not os.path.isfile(metaDataFilePath) :
             bash('kaggle datasets metadata -p '+dataSetPath+' '+getKaggleRefFromFilePathPartStr(dataSetRef))
         if os.path.isfile(metaDataFilePath) :
-            if os.stat(metaDataFilePath).st_size == 0:
+            if os.stat(metaDataFilePath).st_size > 0:
                 self.analyseOneMetaDataFile(metaDataFilePath,resDict)
-                os.remove(metaDataFilePath)
+            os.remove(metaDataFilePath)
 
     def analyseOneMetaDataFile(self,filePath,resDict):
         with open(filePath, encoding='utf-8') as f:
@@ -37,7 +37,7 @@ class DataSetTypeMetaDataAnalyser(KaggleDataSetAnalyser):
                         if(len(regexArr)>0):
                             for typeRegex in regexArr:
                                 if re.search(typeRegex, keywords.strip().lower()) is not None:
-                                    resDict['type']=dataSetType
+                                    resDict['type']=dataSetType.value
                                     break
                     for goal in metaDataGoal:
                         if goal.strip().lower() in keywords.strip().lower():

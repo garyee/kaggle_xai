@@ -119,7 +119,7 @@ class DataSetTypes(Enum):
   IMAGE = 'Image'
   VIDEO = 'Video'
   TEXT = 'Text'
-  TIME_SERIES = 'Time series'
+  TIME_SERIES = 'Time Series'
   MISC = 'Misc'
 
   def getAllKnownExtensions():
@@ -151,18 +151,18 @@ class DataSetTypes(Enum):
         'import nltk',
         'import spacy',
         'from spacy',
-        'feature_extraction.text',
-        'sklearn.feature_extraction.text',
+        'feature_extraction\.text',
+        'sklearn.feature_extraction\.text',
         'Tokenizer',
         'Vectorizer',
       ],
       DataSetTypes.TIME_SERIES:[
-        '.to_datetime(',
+        '\.to_datetime\(',
         'date',
         'time',
         'time[^a-zA-Z0-9]{1}serie[s]*',
         'to_period',
-        'statsmodels.tsa',
+        'statsmodels\.tsa',
         'from tsfresh',
         'import tsfresh',
         'from darts',
