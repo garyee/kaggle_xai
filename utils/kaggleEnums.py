@@ -115,3 +115,44 @@ def getKaggleRefFromFilePathPartStr(filePathPart):
   return filePathPart.replace('_____','/')
 
 metaDataGoal=['regression','classification']
+
+def getAllKnownExtensions():
+    return ['csv',
+            'xls',
+            'xlsx',
+            'npy',
+            'parquet',
+            'paruqet',
+            'npz',
+            'tsv',
+            'json',
+            'db',
+            'sqlite',
+            'jpg',
+            'gif',
+            'png',
+            'mpg',
+            'mp4',
+            'mpeg',
+            'tfrec',
+            'txt',
+            'pdf',
+            'sh',
+            'py',
+            'md',
+            'pkl',
+            'r',
+            'zip',
+            'gz',
+            'readme',
+            'bz2',
+            'm',
+            'h5',
+            'docx',
+            'so',
+            'encrypted',
+            'dcm',
+            'torrent',
+            '7z'
+            ]
+

@@ -8,7 +8,7 @@ currentConnection=None
 sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     dataSetRef text NOT NULL PRIMARY KEY,
                                     is_competition BOOLEAN NOT NULL constraint enum_is_comp CHECK (is_competition IN (0, 1)) DEFAULT 0,
-                                    type TEXT constraint enum_type CHECK( type IN ('Tabular','Image','Video','Text','Time Series','Misc') ) DEFAULT NULL,
+                                    type TEXT constraint enum_type CHECK( type IN ('Tabular','Image','Video','Text','Time Series','Bio_Chem','Misc') ) DEFAULT NULL,
                                     type_certainty INTEGER NULL constraint certainty_percentage CHECK (type_certainty>=0 and type_certainty<=100) DEFAULT 0,
                                     tab_interaction REAL NULL DEFAULT NULL,
                                     tab_features_total INTEGER NULL DEFAULT NULL,

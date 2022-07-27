@@ -6,18 +6,17 @@ class DataSetTypes(Enum):
   VIDEO = 'Video'
   TEXT = 'Text'
   TIME_SERIES = 'Time Series'
+  BIOCHEM = 'Bio_Chem'
   MISC = 'Misc'
-
-  def getAllKnownExtensions():
-    return ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite','jpg','gif','png','mpg','mp4','mpeg','tfrec','txt','pdf','sh','py','md','pkl','r','zip','gz','readme','bz2','m','h5']
 
   def getExtensions(self=None):
     extensionArray= {
       DataSetTypes.TABULAR: ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite'],
-      DataSetTypes.IMAGE:['jpg','gif','png'],
+      DataSetTypes.IMAGE:['jpg','gif','png','dcm'],
       DataSetTypes.VIDEO:['mpg','mp4','mpeg'],
       DataSetTypes.TEXT:[],
       DataSetTypes.TIME_SERIES:[],
+      DataSetTypes.BIOCHEM:['xyz'],
       DataSetTypes.MISC:[],
     }
     if(self is None):
@@ -31,6 +30,7 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:90,
       DataSetTypes.TEXT:0,
       DataSetTypes.TIME_SERIES:0,
+      DataSetTypes.BIOCHEM:100,
       DataSetTypes.MISC:20,
     }
     if(self is None):
@@ -73,6 +73,8 @@ class DataSetTypes(Enum):
         'from autots',
         'import autots',
       ],
+      DataSetTypes.BIOCHEM:
+        ['from ase'],
       DataSetTypes.MISC:
         [],
     }
@@ -87,6 +89,7 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:0,
       DataSetTypes.TEXT:100,
       DataSetTypes.TIME_SERIES:100,
+      DataSetTypes.BIOCHEM:70,
       DataSetTypes.MISC:0,
     }
     if(self is None):
@@ -101,6 +104,7 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:[r'^video$'],
       DataSetTypes.TEXT:[r'nlp',r'linguistics'],
       DataSetTypes.TIME_SERIES:[r'time series'],
+      DataSetTypes.BIOCHEM:[],
       DataSetTypes.MISC:[],
     }
     if(self is None):
@@ -114,6 +118,7 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:100,
       DataSetTypes.TEXT:90,
       DataSetTypes.TIME_SERIES:100,
+      DataSetTypes.BIOCHEM:0,
       DataSetTypes.MISC:20,
     }
     if(self is None):

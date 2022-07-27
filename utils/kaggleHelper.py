@@ -2,6 +2,8 @@ import os
 import pandas as pd
 from io import StringIO
 
+from utils.DataSetTypes import DataSetTypes
+
 def bash(command):
     output = os.popen(command).read()
     return output
@@ -15,8 +17,9 @@ def setTypeAndCertainty(type,typeCertainty,resDict):
 
 
 
-def getTypeAndCertainty(type,typeCertainty,resType=None,resSetCertainty=None):
-    if(resType is not None and resSetCertainty is not None):
+def getTypeAndCertainty(type,typeCertainty,resTypeStr=None,resSetCertainty=None):
+    if(resTypeStr is not None and resSetCertainty is not None):
+        resType=DataSetTypes(resTypeStr)
         if(type==resType):
             return type.value,max(typeCertainty,resSetCertainty)
         if(resSetCertainty>typeCertainty):

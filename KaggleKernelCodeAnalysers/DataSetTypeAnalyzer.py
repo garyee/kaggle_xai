@@ -1,7 +1,8 @@
 from itertools import count
 import re
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
-from utils.kaggleEnums import DataSetTypes, KaggleEntityType
+from utils.kaggleEnums import KaggleEntityType
+from utils.DataSetTypes import DataSetTypes
 from utils.kaggleHelper import setTypeAndCertainty
 
 class DataSetTypeAnalyzer(KaggleKernelCodeAnalyzer):
