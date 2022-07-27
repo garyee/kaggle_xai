@@ -3,7 +3,8 @@ import os
 import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
 from kaggleDownloader import getDataSetPath
-from utils.kaggleEnums import metaDataGoal, DataSetTypes, KaggleEntityType, getKaggleRefFromFilePathPartStr
+from utils.kaggleEnums import metaDataGoal, KaggleEntityType, getKaggleRefFromFilePathPartStr
+from utils.DataSetTypes import DataSetTypes
 from utils.kaggleHelper import bash, setTypeAndCertainty
 
 class DataSetTypeMetaDataAnalyser(KaggleDataSetAnalyser):

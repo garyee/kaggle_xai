@@ -1,7 +1,8 @@
 import os
 import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
-from utils.kaggleEnums import DataSetTypes, KaggleEntityType
+from utils.kaggleEnums import KaggleEntityType
+from utils.DataSetTypes import DataSetTypes
 from utils.kaggleHelper import kaggleCommand2DF, setTypeAndCertainty
 import utils.database as database
 
