@@ -43,6 +43,8 @@ sql_create_dataset_blacklist = """ CREATE TABLE IF NOT EXISTS dataset_blacklist 
                                     is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
                                     reason text NULL DEFAULT NULL
                                 ); """
+def insertOrUpdateKernelXAI(dataDict):
+
 
 def shiftDataSetToBlackList(dataSetRef,entityType,reason):
     isCompetition=getIsCompetitionfromEntityType(entityType)
