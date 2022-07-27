@@ -1,7 +1,7 @@
 import os
 import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
-from utils.kaggleEnums import KaggleEntityType
+from utils.kaggleEnums import KaggleEntityType, getAllKnownExtensions
 from utils.DataSetTypes import DataSetTypes
 from utils.kaggleHelper import kaggleCommand2DF, setTypeAndCertainty
 import utils.database as database
@@ -30,7 +30,7 @@ class DataSetTypeFileListAnalyser(KaggleDataSetAnalyser):
 
     def fillCountArr(self,file_extension,countPerType,fileSize,entityRef):
         fileType=DataSetTypes.MISC
-        if file_extension in DataSetTypes.getAllKnownExtensions():
+        if file_extension in getAllKnownExtensions():
             for dataSetType in DataSetTypes:
                 if file_extension in dataSetType.getExtensions():
                     fileType=dataSetType
