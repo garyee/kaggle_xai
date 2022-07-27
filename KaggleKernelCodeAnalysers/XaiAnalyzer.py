@@ -1,6 +1,10 @@
+import re
+import database
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
 
 class XaiAnalyser(KaggleKernelCodeAnalyzer):
+
+  xaiMethodsResSet={}
 
   termsDict= {
   "PH_ALE": ["import.*ALE","import.*plot_ale"],
@@ -25,14 +29,16 @@ class XaiAnalyser(KaggleKernelCodeAnalyzer):
 #     #xaiMethodKeys.append('filepath')
 #     return xaiMethodKeys
 
-  def analyse(self,cell,resultDict):
+  def analyseCell(self,sourceCell,isLastCell,currentDataSetChanged,resultKernelDict,resultDataSetDict):
     matches={}
     for key,regularExpressions in XaiAnalyser.termsDict.items():
-        if (filePath not in matches) or (type(matches[filePath]) is list and key not in matches[filePath]):
-            for regex in regularExpressions:
-                if re.search(re.compile(regex, re.S), cell['source']):
-                    if(filePath in matches and type(matches[filePath]) == list and key not in matches[filePath]):
-                        matches[filePath].append(key)
-                    else:
-                        matches[filePath]=[key]
-    return matches
+      for regex in regularExpressions:
+          if re.search(re.compile(regex, re.S), sourceCell):
+              if(key not in self.xaiMethodsResSet):
+                  self.xaiMethodsResSet[key]=1
+              else:
+                  self.xaiMethodsResSet[key]=[key]
+    if(isLastCell):
+      typeVotePerDataSet['kernelRef']=KernelRef
+      database.insertOrUpdateKernelXAI
+      typeVotePerDataSet={}
