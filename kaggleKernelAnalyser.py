@@ -4,10 +4,10 @@ from tqdm import tqdm
 import json
 from KaggleDataSetAnalysers.DataSetTypeFileListAnalyser import DataSetTypeFileListAnalyser
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
-from kaggleEnums import basePath,KaggleEntityType, KernelLanguage, getAllInfoFromKernelPath, getIsCompetitionfromEntityType, testKernelsRefs
+from utils.kaggleEnums import basePath,KaggleEntityType, KernelLanguage, getAllInfoFromKernelPath, getIsCompetitionfromEntityType, testKernelsRefs
 from kaggleDownloader import downloadKernelByRef,getKernelPath
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
-import database
+import utils.database as database
 
 def getTestKernelFiles():
     matches=[]

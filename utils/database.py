@@ -1,5 +1,5 @@
 from sqlite3 import connect, Error
-from kaggleEnums import KaggleEntityType, filePath, getIsCompetitionfromEntityType
+from utils.kaggleEnums import KaggleEntityType, filePath, getIsCompetitionfromEntityType
 
 databasePath = filePath+"kaggleSqlite.db"
 
@@ -43,7 +43,7 @@ sql_create_dataset_blacklist = """ CREATE TABLE IF NOT EXISTS dataset_blacklist 
                                     is_competition BOOLEAN NOT NULL CHECK (is_competition IN (0, 1)) DEFAULT 0,
                                     reason text NULL DEFAULT NULL
                                 ); """
-def insertOrUpdateKernelXAI(dataDict):
+# def insertOrUpdateKernelXAI(dataDict):
 
 
 def shiftDataSetToBlackList(dataSetRef,entityType,reason):

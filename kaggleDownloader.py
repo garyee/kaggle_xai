@@ -1,6 +1,6 @@
 import os
-from kaggleEnums import KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef,kernelListPageSize,testKernelsRefs
-from kaggleHelper import bash,kaggleCommand2DF
+from utils.kaggleEnums import KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef,kernelListPageSize,testKernelsRefs
+from utils.kaggleHelper import bash,kaggleCommand2DF
 #from tqdm.notebook import trange, tqdm
 from tqdm import tqdm
 

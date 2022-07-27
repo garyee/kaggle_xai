@@ -1,5 +1,5 @@
 import re
-import database
+import utils.database as database
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
 
 class XaiAnalyser(KaggleKernelCodeAnalyzer):
@@ -38,7 +38,7 @@ class XaiAnalyser(KaggleKernelCodeAnalyzer):
                   self.xaiMethodsResSet[key]=1
               else:
                   self.xaiMethodsResSet[key]=[key]
-    if(isLastCell):
-      typeVotePerDataSet['kernelRef']=KernelRef
-      database.insertOrUpdateKernelXAI
-      typeVotePerDataSet={}
+    # if(isLastCell):
+      # typeVotePerDataSet['kernelRef']=KernelRef
+      # database.insertOrUpdateKernelXAI
+      # typeVotePerDataSet={}
