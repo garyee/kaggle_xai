@@ -2,6 +2,7 @@ from itertools import count
 import re
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
 from kaggleEnums import DataSetTypes, KaggleEntityType
+from kaggleHelper import setTypeAndCertainty
 
 class DataSetTypeAnalyzer(KaggleKernelCodeAnalyzer):
 
@@ -43,7 +44,7 @@ class DataSetTypeAnalyzer(KaggleKernelCodeAnalyzer):
             dataSetFinalType=dataType
             dataSetFinalCount=count
         if(dataSetFinalType is not None):
-          resultDataSetDict['type']=dataSetFinalType.value
+          setTypeAndCertainty(dataSetFinalType,dataSetFinalType.getCodeTypeCertanties(),resultDataSetDict)
         self.typeVotePerDataSet={}
         dataSetFinalType=None
         dataSetFinalCount=0

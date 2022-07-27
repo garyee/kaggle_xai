@@ -2,7 +2,7 @@ import os
 import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
 from kaggleEnums import DataSetTypes, KaggleEntityType
-from kaggleHelper import kaggleCommand2DF
+from kaggleHelper import kaggleCommand2DF, setTypeAndCertainty
 import database
 
 class DataSetTypeFileListAnalyser(KaggleDataSetAnalyser):
@@ -43,13 +43,14 @@ class DataSetTypeFileListAnalyser(KaggleDataSetAnalyser):
 
     def getFileTypeFromCountArr(self,countPerType,overAllFileSize,resDict):
         maxType=DataSetTypes.MISC
-        maxFileSizeSum=0
+        maxFileSizeRatio=0
         for fileTypeCounted, countedFileSizePerType in countPerType.items():
-            if(countedFileSizePerType/overAllFileSize>maxFileSizeSum):
+            fileRatio=countedFileSizePerType/overAllFileSize
+            if(fileRatio>maxFileSizeRatio):
                 maxType=fileTypeCounted
-                maxFileSizeSum=countedFileSizePerType/overAllFileSize
-        if maxType is not None:
-            resDict['type']=maxType.value
+                maxFileSizeRatio=countedFileSizePerType/overAllFileSize
+        typeCertainty=min(int(maxFileSizeRatio*100),maxType.getExtensionsCertanties())
+        setTypeAndCertainty(maxType,typeCertainty,resDict)
 
     def parseFileSize(self,fileSizeStr):
         units = {"B": 1, "KB": 2**10, "MB": 2**20, "GB": 2**30, "TB": 2**40 ,

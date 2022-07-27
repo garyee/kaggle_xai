@@ -4,7 +4,7 @@ import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
 from kaggleDownloader import getDataSetPath
 from kaggleEnums import metaDataGoal, DataSetTypes, KaggleEntityType, getKaggleRefFromFilePathPartStr
-from kaggleHelper import bash
+from kaggleHelper import bash, setTypeAndCertainty
 
 class DataSetTypeMetaDataAnalyser(KaggleDataSetAnalyser):
     
@@ -37,7 +37,7 @@ class DataSetTypeMetaDataAnalyser(KaggleDataSetAnalyser):
                         if(len(regexArr)>0):
                             for typeRegex in regexArr:
                                 if re.search(typeRegex, keywords.strip().lower()) is not None:
-                                    resDict['type']=dataSetType.value
+                                    setTypeAndCertainty(dataSetType,dataSetType.getMetaDataTypeCertanties(),resDict)
                                     break
                     for goal in metaDataGoal:
                         if goal.strip().lower() in keywords.strip().lower():

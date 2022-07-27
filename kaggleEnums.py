@@ -138,6 +138,19 @@ class DataSetTypes(Enum):
       return extensionArray
     return extensionArray[self]
 
+  def getExtensionsCertanties(self=None):
+    certainties= {
+      DataSetTypes.TABULAR:60,
+      DataSetTypes.IMAGE:90,
+      DataSetTypes.VIDEO:90,
+      DataSetTypes.TEXT:0,
+      DataSetTypes.TIME_SERIES:0,
+      DataSetTypes.MISC:20,
+    }
+    if(self is None):
+      return certainties
+    return certainties[self]
+
   def getSourceCodeRegExes(self=None):
     regExArray= {
       DataSetTypes.TABULAR: 
@@ -157,11 +170,11 @@ class DataSetTypes(Enum):
         'Vectorizer',
       ],
       DataSetTypes.TIME_SERIES:[
-        '\.to_datetime\(',
-        'date',
-        'time',
+        # '\.to_datetime\(',
+        # 'date',
+        # 'time',
         'time[^a-zA-Z0-9]{1}serie[s]*',
-        'to_period',
+        # 'to_period',
         'statsmodels\.tsa',
         'from tsfresh',
         'import tsfresh',
@@ -181,6 +194,19 @@ class DataSetTypes(Enum):
       return regExArray
     return regExArray[self]
 
+  def getCodeTypeCertanties(self=None):
+    certainties= {
+      DataSetTypes.TABULAR:0,
+      DataSetTypes.IMAGE:0,
+      DataSetTypes.VIDEO:0,
+      DataSetTypes.TEXT:100,
+      DataSetTypes.TIME_SERIES:100,
+      DataSetTypes.MISC:0,
+    }
+    if(self is None):
+      return certainties
+    return certainties[self]
+
   def getMetaDataKeywordRegexes(self=None):
     #See DB Fields & order matters:
     regExArray= {
@@ -194,6 +220,19 @@ class DataSetTypes(Enum):
     if(self is None):
       return regExArray
     return regExArray[self]
+
+  def getMetaDataTypeCertanties(self=None):
+    certainties= {
+      DataSetTypes.TABULAR:60,
+      DataSetTypes.IMAGE:100,
+      DataSetTypes.VIDEO:100,
+      DataSetTypes.TEXT:90,
+      DataSetTypes.TIME_SERIES:100,
+      DataSetTypes.MISC:20,
+    }
+    if(self is None):
+      return certainties
+    return certainties[self]
 
 def __str__(self):
       return str(self.value)
