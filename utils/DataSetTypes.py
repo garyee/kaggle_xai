@@ -4,6 +4,7 @@ class DataSetTypes(Enum):
   TABULAR = 'Tabular'
   IMAGE = 'Image'
   VIDEO = 'Video'
+  SOUND = 'Sound'
   TEXT = 'Text'
   TIME_SERIES = 'Time Series'
   BIOCHEM = 'Bio_Chem'
@@ -12,8 +13,9 @@ class DataSetTypes(Enum):
   def getExtensions(self=None):
     extensionArray= {
       DataSetTypes.TABULAR: ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite'],
-      DataSetTypes.IMAGE:['jpg','gif','png','dcm'],
+      DataSetTypes.IMAGE:['jpg','gif','png','dcm','tif'],
       DataSetTypes.VIDEO:['mpg','mp4','mpeg'],
+      DataSetTypes.SOUND:['mp3'],
       DataSetTypes.TEXT:[],
       DataSetTypes.TIME_SERIES:[],
       DataSetTypes.BIOCHEM:['xyz'],
@@ -28,6 +30,7 @@ class DataSetTypes(Enum):
       DataSetTypes.TABULAR:60,
       DataSetTypes.IMAGE:90,
       DataSetTypes.VIDEO:90,
+      DataSetTypes.SOUND:90,
       DataSetTypes.TEXT:0,
       DataSetTypes.TIME_SERIES:0,
       DataSetTypes.BIOCHEM:100,
@@ -45,6 +48,8 @@ class DataSetTypes(Enum):
         [],
       DataSetTypes.VIDEO:
         [],
+      DataSetTypes.SOUND:
+        ['import librosa'],
       DataSetTypes.TEXT:[
         'from nltk',
         'import nltk',
@@ -87,9 +92,53 @@ class DataSetTypes(Enum):
       DataSetTypes.TABULAR:0,
       DataSetTypes.IMAGE:0,
       DataSetTypes.VIDEO:0,
-      DataSetTypes.TEXT:100,
-      DataSetTypes.TIME_SERIES:100,
+      DataSetTypes.SOUND:70,
+      DataSetTypes.TEXT:80,
+      DataSetTypes.TIME_SERIES:80,
       DataSetTypes.BIOCHEM:70,
+      DataSetTypes.MISC:0,
+    }
+    if(self is None):
+      return certainties
+    return certainties[self]
+
+  def getWordCountRefExes(self=None):
+    regExArray= {
+      DataSetTypes.TABULAR: 
+        ['tabular'],
+      DataSetTypes.IMAGE:
+        ['image','picture'],
+      DataSetTypes.VIDEO:
+        ['[\W]video[\W]'],
+      DataSetTypes.SOUND:
+        ['song','sound'],
+      DataSetTypes.TEXT:
+        ['text'],
+      DataSetTypes.TIME_SERIES:
+        [
+        # 'date',
+        # 'time',
+        'time[^a-zA-Z0-9]{1}serie[s]*',
+        # 'period'
+        ],
+      DataSetTypes.BIOCHEM:
+        ['from ase'],
+      DataSetTypes.MISC:
+        [],
+    }
+    if(self is None):
+      return regExArray
+    return regExArray[self]
+
+  def getWordCountCertanties(self=None):
+    certainties= {
+      DataSetTypes.TABULAR:50,
+      DataSetTypes.IMAGE:70,
+      DataSetTypes.VIDEO:50,
+      DataSetTypes.SOUND:60,
+      DataSetTypes.TEXT:20,
+      DataSetTypes.TIME_SERIES:30,
+      DataSetTypes.BIOCHEM:50,
       DataSetTypes.MISC:0,
     }
     if(self is None):

@@ -4,6 +4,8 @@ from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeA
 
 class XaiAnalyser(KaggleKernelCodeAnalyzer):
 
+  CELLTYPEFILTERARR=['code']
+
   xaiMethodsResSet={}
 
   termsDict= {

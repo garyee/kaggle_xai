@@ -2,26 +2,48 @@ from abc import ABC, abstractmethod
 
 class KaggleKernelCodeAnalyzer(ABC):
   
-  # @classmethod
-  # @abstractmethod
-  # def getHeader(self):
-  #       pass
+  @classmethod
+  @property
+  @abstractmethod
+  def CELLTYPEFILTERARR(ctfa):
+      raise NotImplementedError
 
   @classmethod
   @abstractmethod
   def analyseCell(self,sourceCode,cellType):
         pass
 
+  @classmethod
+  @abstractmethod
+  def onDataSetChanged(self,resultKernelDict):
+        pass
+  
+  @classmethod
+  @abstractmethod
+  def onLastCell(self):
+        pass
+
   def analyse(self,cells,currentDataSetChanged,resultKernelDict,resultDataSetDict):
+    #datasetChanges occur right before the first kernel of the new one
+    if(currentDataSetChanged==True):
+      self.onDataSetChanged(resultDataSetDict)
     indexOfLastSourceCell=None
-    for reverseIndex, cell in reversed(list(enumerate(cells))):
-      if('cell_type' in cell and cell['cell_type'] == 'code'):
-        indexOfLastSourceCell=reverseIndex
-        break
+    if(len(self.CELLTYPEFILTERARR)>0):
+      for reverseIndex, cell in reversed(list(enumerate(cells))):
+        if('cell_type' in cell and cell['cell_type'] in self.CELLTYPEFILTERARR):
+          indexOfLastSourceCell=reverseIndex
+          break
+    else:
+      indexOfLastSourceCell=len(cells)-1
+
     for index,cell in enumerate(cells):
       isLastCell=index==indexOfLastSourceCell if indexOfLastSourceCell is not None else index==len(cells)-1
-      if cell['cell_type'] == 'code' and 'source' in cell and cell['source'] is not None:
+      if(len(self.CELLTYPEFILTERARR)>0):
+        if 'cell_type' in cell and cell['cell_type'] not in self.CELLTYPEFILTERARR:
+          continue
+      if 'source' in cell and cell['source'] is not None:
           if type(cell['source']) == str:
-            self.analyseCell(cell['source'],isLastCell,currentDataSetChanged,resultKernelDict,resultDataSetDict)
+            self.analyseCell(cell['source'])
       if(isLastCell):
+        self.onLastCell()
         break

@@ -153,6 +153,10 @@ def getAllKnownExtensions():
             'encrypted',
             'dcm',
             'torrent',
-            '7z'
+            '7z',
+            'xyz',
+            'rtf',
+            'tif',
+            'mp3',
             ]
 

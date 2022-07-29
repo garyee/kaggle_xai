@@ -8,7 +8,7 @@ currentConnection=None
 sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     dataSetRef text NOT NULL PRIMARY KEY,
                                     is_competition BOOLEAN NOT NULL constraint enum_is_comp CHECK (is_competition IN (0, 1)) DEFAULT 0,
-                                    type TEXT constraint enum_type CHECK( type IN ('Tabular','Image','Video','Text','Time Series','Bio_Chem','Misc') ) DEFAULT NULL,
+                                    type TEXT constraint enum_type CHECK( type IN ('Tabular','Image','Video','Text','Time Series','Bio_Chem','Sound','Misc') ) DEFAULT NULL,
                                     type_certainty INTEGER NULL constraint certainty_percentage CHECK (type_certainty>=0 and type_certainty<=100) DEFAULT 0,
                                     tab_interaction REAL NULL DEFAULT NULL,
                                     tab_features_total INTEGER NULL DEFAULT NULL,
@@ -54,6 +54,8 @@ def shiftDataSetToBlackList(dataSetRef,entityType,reason):
     execute_write_query(deleteCommand)
 
 def insertDataBase(dataSetRef,is_competition):
+    if(not isinstance(is_competition, int) or not isinstance(dataSetRef, str)):
+        raise Exception("Error upon inserting a Database!")
     query="INSERT OR IGNORE INTO dataset_info (dataSetRef,is_competition) VALUES ('"+dataSetRef+"', '"+str(is_competition)+"');"
     execute_write_query(query)
 
