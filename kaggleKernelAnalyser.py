@@ -62,6 +62,7 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
                 # print('INIT new DS: '+parentEntityRef)
                 # update DS db with dict
                 if(lastDataSetRef is not None and 'dataSetRef' in resultDataSetDict and len(resultDataSetDict.keys())>2):
+                    kernelAnalysersCloseDataSet(parentEntityType,resultDataSetDict,kernelAnalysersInstances)
                     database.updateDataSetToDB(resultDataSetDict)
                 resultDataSetDict={
                         'dataSetRef':parentEntityRef,'is_competition':getIsCompetitionfromEntityType(parentEntityType)
@@ -82,6 +83,11 @@ def analyseDataSet(dataSetRef,dataSetType,resultDataSetDict,dataSetAnalysersInst
     if(dataSetType!=KaggleEntityType.NONE):
         for dataSetAnalyser in dataSetAnalysersInstances:
             dataSetAnalyser.analyse(dataSetRef,dataSetType,resultDataSetDict)
+
+def kernelAnalysersCloseDataSet(dataSetType,resultDataSetDict,kernelAnalysersInstances = []):
+    if(dataSetType!=KaggleEntityType.NONE):
+        for kernelAnalyser in kernelAnalysersInstances:
+            kernelAnalyser.onDataSetChanged(resultDataSetDict)
     
 def analyseKernelFile(filePath,currentDataSetChanged,resultKernelDict,resultDataSetDict,kernelAnalysersInstances = []):
     if os.stat(filePath).st_size == 0:
@@ -104,7 +110,7 @@ def analyseKernelFile(filePath,currentDataSetChanged,resultKernelDict,resultData
         #     language=KernelLanguage.PYTHON
         if 'cells' in kernelCode:
             for kernelAnalyser in kernelAnalysersInstances:
-                    kernelAnalyser.analyse(kernelCode['cells'],currentDataSetChanged,resultKernelDict,resultDataSetDict)
+                    kernelAnalyser.analyse(kernelCode['cells'])
 
 
 # analyseOneKernelFile('C:/Users/garyee/gDrive/Colab/Kaggle/kernels/datasets/kaggle_____meta-kaggle/benhamner_____predicting-which-scripts-get-votes/predicting-which-scripts-get-votes.ipynb')

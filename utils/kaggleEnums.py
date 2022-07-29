@@ -116,6 +116,8 @@ def getKaggleRefFromFilePathPartStr(filePathPart):
 
 metaDataGoal=['regression','classification']
 
+compressionExtensions = ['zip','gz','7z']
+
 def getAllKnownExtensions():
     return ['csv',
             'xls',

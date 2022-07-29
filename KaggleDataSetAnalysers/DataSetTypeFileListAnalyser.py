@@ -1,7 +1,7 @@
 import os
 import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
-from utils.kaggleEnums import KaggleEntityType, getAllKnownExtensions
+from utils.kaggleEnums import KaggleEntityType, getAllKnownExtensions, compressionExtensions
 from utils.DataSetTypes import DataSetTypes
 from utils.kaggleHelper import kaggleCommand2DF, setTypeAndCertainty
 import utils.database as database
@@ -21,16 +21,17 @@ class DataSetTypeFileListAnalyser(KaggleDataSetAnalyser):
             for index, row in fileList.iterrows():
                 filename=row['name']
                 fileSize=self.parseFileSize(row['size'])
-                _, file_extension = os.path.splitext(filename)
+                file_name_stump, file_extension = os.path.splitext(filename)
                 file_extension=file_extension.lstrip('.').lower().strip();
                 if file_extension!='':
                     overAllFileSize+=fileSize
-                    self.fillCountArr(file_extension,countPerType,fileSize,entityRef)
+                    self.fillCountArr(file_extension,file_name_stump,countPerType,fileSize,entityRef)
             self.getFileTypeFromCountArr(countPerType,overAllFileSize,resDict)
 
-    def fillCountArr(self,file_extension,countPerType,fileSize,entityRef):
+    def fillCountArr(self,file_extension,file_name_stump,countPerType,fileSize,entityRef):
         fileType=DataSetTypes.MISC
         if file_extension in getAllKnownExtensions():
+            file_extension=self.checkZipfileNames(file_name_stump, file_extension)
             for dataSetType in DataSetTypes:
                 if file_extension in dataSetType.getExtensions():
                     fileType=dataSetType
@@ -41,6 +42,16 @@ class DataSetTypeFileListAnalyser(KaggleDataSetAnalyser):
             countPerType[fileType]=fileSize
         else:
             countPerType[fileType]+=fileSize
+
+    def checkZipfileNames(self,file_name_stump, file_extension):
+        if(file_extension in compressionExtensions):
+            for dataSetType in DataSetTypes:
+                extensionArr= dataSetType.getExtensions()
+                if(len(extensionArr)>0):
+                    for extension in extensionArr:
+                        if re.search(extension, file_name_stump.strip().lower()) is not None:
+                            return extension
+        return file_extension
 
     def getFileTypeFromCountArr(self,countPerType,overAllFileSize,resDict):
         maxType=DataSetTypes.MISC

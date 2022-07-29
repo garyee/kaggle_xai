@@ -15,8 +15,6 @@ class DataSetTypeWordCounterAnalyzer(KaggleKernelCodeAnalyzer):
     self._kernel_count = 0
 
   def analyseCell(self,sourceCell):
-    maxType=None
-    maxCount=0
     for dataSetType in DataSetTypes:
       regexArr= dataSetType.getWordCountRefExes()
       if(len(regexArr)>0):

@@ -23,10 +23,8 @@ class KaggleKernelCodeAnalyzer(ABC):
   def onLastCell(self):
         pass
 
-  def analyse(self,cells,currentDataSetChanged,resultKernelDict,resultDataSetDict):
+  def analyse(self,cells):
     #datasetChanges occur right before the first kernel of the new one
-    if(currentDataSetChanged==True):
-      self.onDataSetChanged(resultDataSetDict)
     indexOfLastSourceCell=None
     if(len(self.CELLTYPEFILTERARR)>0):
       for reverseIndex, cell in reversed(list(enumerate(cells))):
