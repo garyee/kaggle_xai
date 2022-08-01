@@ -3,6 +3,7 @@ from KaggleDataSetAnalysers.DataSetTypeMetaDataAnalyser import DataSetTypeMetaDa
 from KaggleKernelCodeAnalysers.DataSetTypeAnalyzer import DataSetTypeAnalyzer
 from KaggleKernelCodeAnalysers.DataSetTypeWordCounterAnalyzer import DataSetTypeWordCounterAnalyzer
 from kaggleKernelAnalyser import analyseAllKernels
+from utils.DataSetTypes import DataSetTypes
 
 def fillDatabase():
     analyseAllKernels(dataSetAnalysers=[DataSetTypeFileListAnalyser,DataSetTypeMetaDataAnalyser],kernelAnalysers=[DataSetTypeAnalyzer,DataSetTypeWordCounterAnalyzer])

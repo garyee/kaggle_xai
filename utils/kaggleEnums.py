@@ -160,5 +160,8 @@ def getAllKnownExtensions():
             'rtf',
             'tif',
             'mp3',
+            'rds',
+            'jsonl',
+            'dicom'
             ]
 

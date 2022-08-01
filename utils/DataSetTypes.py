@@ -14,8 +14,8 @@ class DataSetTypes(Enum):
     extensionArray= {
       DataSetTypes.TABULAR: ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite'],
       DataSetTypes.IMAGE:['jpg','gif','png','dcm','tif'],
-      DataSetTypes.VIDEO:['mpg','mp4','mpeg'],
-      DataSetTypes.SOUND:['mp3'],
+      DataSetTypes.VIDEO:['mpg','mp4','mpeg','dicom'],
+      DataSetTypes.SOUND:['mp3','wav'],
       DataSetTypes.TEXT:[],
       DataSetTypes.TIME_SERIES:[],
       DataSetTypes.BIOCHEM:['xyz'],
@@ -153,6 +153,7 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:[r'^video$'],
       DataSetTypes.TEXT:[r'nlp',r'linguistics'],
       DataSetTypes.TIME_SERIES:[r'time series'],
+      DataSetTypes.SOUND:[''],
       DataSetTypes.BIOCHEM:[],
       DataSetTypes.MISC:[],
     }
@@ -167,6 +168,7 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:100,
       DataSetTypes.TEXT:90,
       DataSetTypes.TIME_SERIES:100,
+      DataSetTypes.SOUND:0,
       DataSetTypes.BIOCHEM:0,
       DataSetTypes.MISC:20,
     }
