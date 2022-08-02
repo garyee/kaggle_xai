@@ -168,6 +168,13 @@ def getAllKnownExtensions():
             '0',
             'flac',
             'mos',
-            'pb'
+            'pb',
+            'ogg',
+            'nii',
+            'nmea',
+            '20o',
+            '21o',
+            '22o'
+
             ]
 

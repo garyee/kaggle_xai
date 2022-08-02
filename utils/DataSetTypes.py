@@ -8,17 +8,21 @@ class DataSetTypes(Enum):
   TEXT = 'Text'
   TIME_SERIES = 'Time Series'
   BIOCHEM = 'Bio_Chem'
+  CODE='Source Code'
+  GIS='Geo'
   MISC = 'Misc'
 
   def getExtensions(self=None):
     extensionArray= {
       DataSetTypes.TABULAR: ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite'],
-      DataSetTypes.IMAGE:['jpg','gif','png','dcm','tif','tiff','tfw','mos'],
+      DataSetTypes.IMAGE:['jpg','gif','png','dcm','tif','tiff','tfw','mos','ogg','nii'],
       DataSetTypes.VIDEO:['mpg','mp4','mpeg','dicom'],
       DataSetTypes.SOUND:['mp3','wav','flac'],
       DataSetTypes.TEXT:[],
       DataSetTypes.TIME_SERIES:[],
       DataSetTypes.BIOCHEM:['xyz'],
+      DataSetTypes.GIS:['nmea','20o','21o','22o'],
+      DataSetTypes.CODE:['ipynb','py','js','html','in'],
       DataSetTypes.MISC:[],
     }
     if(self is None):
@@ -34,6 +38,8 @@ class DataSetTypes(Enum):
       DataSetTypes.TEXT:0,
       DataSetTypes.TIME_SERIES:0,
       DataSetTypes.BIOCHEM:100,
+      DataSetTypes.CODE:60,
+      DataSetTypes.GIS:80,
       DataSetTypes.MISC:20,
     }
     if(self is None):
@@ -80,6 +86,10 @@ class DataSetTypes(Enum):
       ],
       DataSetTypes.BIOCHEM:
         ['from ase'],
+      DataSetTypes.CODE:
+        [],
+      DataSetTypes.GIS:
+        [],
       DataSetTypes.MISC:
         [],
     }
@@ -96,6 +106,8 @@ class DataSetTypes(Enum):
       DataSetTypes.TEXT:80,
       DataSetTypes.TIME_SERIES:80,
       DataSetTypes.BIOCHEM:70,
+      DataSetTypes.CODE:0,
+      DataSetTypes.GIS:0,
       DataSetTypes.MISC:0,
     }
     if(self is None):
@@ -123,6 +135,10 @@ class DataSetTypes(Enum):
         ],
       DataSetTypes.BIOCHEM:
         ['from ase'],
+      DataSetTypes.CODE:
+        [],
+      DataSetTypes.GIS:
+        [],
       DataSetTypes.MISC:
         [],
     }
@@ -139,6 +155,8 @@ class DataSetTypes(Enum):
       DataSetTypes.TEXT:20,
       DataSetTypes.TIME_SERIES:30,
       DataSetTypes.BIOCHEM:50,
+      DataSetTypes.CODE:0,
+      DataSetTypes.GIS:0,
       DataSetTypes.MISC:0,
     }
     if(self is None):
@@ -153,8 +171,10 @@ class DataSetTypes(Enum):
       DataSetTypes.VIDEO:[r'^video$'],
       DataSetTypes.TEXT:[r'nlp',r'linguistics'],
       DataSetTypes.TIME_SERIES:[r'time series'],
-      DataSetTypes.SOUND:[''],
+      DataSetTypes.SOUND:[],
       DataSetTypes.BIOCHEM:[],
+      DataSetTypes.CODE:[],
+      DataSetTypes.GIS:[],
       DataSetTypes.MISC:[],
     }
     if(self is None):
@@ -170,6 +190,8 @@ class DataSetTypes(Enum):
       DataSetTypes.TIME_SERIES:100,
       DataSetTypes.SOUND:0,
       DataSetTypes.BIOCHEM:0,
+      DataSetTypes.CODE:0,
+      DataSetTypes.GIS:0,
       DataSetTypes.MISC:20,
     }
     if(self is None):
