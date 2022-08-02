@@ -39,6 +39,13 @@ parentEntityPathStrList=['datasets','competitions','none']
 #filePath= '/content/drive/MyDrive/Colab'
 filePath="C:/Users/garyee/gDrive/Colab/Kaggle/"
 basePath= filePath+'kernels/'
+tmpPath= filePath+'tmp/'
+
+if(not os.path.exists(basePath)):
+  os.mkdir(basePath)
+if(not os.path.exists(tmpPath)):
+  os.mkdir(tmpPath)
+
 basePathPerDataSet= basePath+'datasets'
 basePathPerCompetitions= basePath+'competitions'
 basePathNone= basePath+'none'
@@ -116,7 +123,13 @@ def getKaggleRefFromFilePathPartStr(filePathPart):
 
 metaDataGoal=['regression','classification']
 
-compressionExtensions = ['zip','gz','7z']
+compressionExtensions = ['zip','gz','7z','rar']
+
+def isArchiveFile(fileName):
+  file_name_stump, file_extension = os.path.splitext(fileName)
+  if(file_extension in compressionExtensions):
+    return True
+  return False
 
 def getAllKnownExtensions():
     return ['csv',
@@ -174,7 +187,10 @@ def getAllKnownExtensions():
             'nmea',
             '20o',
             '21o',
-            '22o'
-
+            '22o',
+            'js',
+            'ipynb',
+            'html',
+            'in'
             ]
 

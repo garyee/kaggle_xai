@@ -1,6 +1,7 @@
 import os
+import re
 import shutil
-from utils.kaggleEnums import KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef,kernelListPageSize,testKernelsRefs
+from utils.kaggleEnums import tmpPath,KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef, isArchiveFile,kernelListPageSize,testKernelsRefs
 from utils.kaggleHelper import bash,kaggleCommand2DF
 #from tqdm.notebook import trange, tqdm
 from tqdm import tqdm
@@ -70,10 +71,19 @@ def getDataSetPath(dataSetRef):
 def deleteDataSetFolder(dataSetRef):
   dataSetPath=getDataSetPath(dataSetRef)
   if os.path.exists(dataSetPath):
-    shutil.rmtree(dataSetPath, ignore_errors=True)
+    shutil.rmtree(dataSetPath)
     # shutil.rmtree(dataSetPath, ignore_errors=True)
     print ("Directory deleted: "+dataSetPath)
   else:
       print ("Directory does not exist: "+dataSetPath)
 
-# def downloadDataSetFilesByDataSetRef(dataSetRef):
+def downloadDataSetFilesByDataSetRef(dataSetRef,dataSetType =KaggleEntityType.DATASET):
+  command ='kaggle '+getKaggleEntityString(dataSetType,True)+' files '+dataSetRef
+  fileList = kaggleCommand2DF(command)
+  for fileName in list(fileList.iloc[:,0]):
+    isZip=isArchiveFile(fileName)
+    if re.match(r'.*train.*\..*', fileName.strip().lower()):
+      print(dataSetRef+' '+fileName)
+
+def downloadOneFile(dataSetRef,fileName,isZip):
+  bash('kaggle datasets download -f '+fileName+' -p '+tmpPath+''+('' if isZip else'--unzip')+' '+dataSetRef)

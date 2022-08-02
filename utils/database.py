@@ -1,4 +1,5 @@
 from sqlite3 import connect, Error
+from kaggleDownloader import deleteDataSetFolder
 from utils.kaggleEnums import KaggleEntityType, filePath, getIsCompetitionfromEntityType
 
 databasePath = filePath+"kaggleSqlite.db"
@@ -52,9 +53,7 @@ def shiftDataSetToBlackList(dataSetRef,entityType,reason):
     execute_write_query(createCommand)
     deleteCommand="DELETE FROM dataset_info WHERE dataSetRef='"+dataSetRef+"';"
     execute_write_query(deleteCommand)
-
-
-
+    deleteDataSetFolder(dataSetRef)
 
 def insertDataBase(dataSetRef,is_competition):
     if(not isinstance(is_competition, int) or not isinstance(dataSetRef, str)):
