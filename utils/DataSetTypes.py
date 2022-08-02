@@ -13,9 +13,9 @@ class DataSetTypes(Enum):
   def getExtensions(self=None):
     extensionArray= {
       DataSetTypes.TABULAR: ['csv','xls','xlsx','npy','parquet','paruqet','npz','tsv','json','db','sqlite'],
-      DataSetTypes.IMAGE:['jpg','gif','png','dcm','tif'],
+      DataSetTypes.IMAGE:['jpg','gif','png','dcm','tif','tiff','tfw','mos'],
       DataSetTypes.VIDEO:['mpg','mp4','mpeg','dicom'],
-      DataSetTypes.SOUND:['mp3','wav'],
+      DataSetTypes.SOUND:['mp3','wav','flac'],
       DataSetTypes.TEXT:[],
       DataSetTypes.TIME_SERIES:[],
       DataSetTypes.BIOCHEM:['xyz'],

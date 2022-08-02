@@ -53,6 +53,9 @@ def shiftDataSetToBlackList(dataSetRef,entityType,reason):
     deleteCommand="DELETE FROM dataset_info WHERE dataSetRef='"+dataSetRef+"';"
     execute_write_query(deleteCommand)
 
+
+
+
 def insertDataBase(dataSetRef,is_competition):
     if(not isinstance(is_competition, int) or not isinstance(dataSetRef, str)):
         raise Exception("Error upon inserting a Database!")

@@ -1,4 +1,5 @@
 import os
+import shutil
 from utils.kaggleEnums import KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef,kernelListPageSize,testKernelsRefs
 from utils.kaggleHelper import bash,kaggleCommand2DF
 #from tqdm.notebook import trange, tqdm
@@ -65,5 +66,14 @@ def getDataSetPath(dataSetRef):
   if(not os.path.exists(pathStump)):
     os.mkdir(pathStump)
   return pathStump
+
+def deleteDataSetFolder(dataSetRef):
+  dataSetPath=getDataSetPath(dataSetRef)
+  if os.path.exists(dataSetPath):
+    shutil.rmtree(dataSetPath, ignore_errors=True)
+    # shutil.rmtree(dataSetPath, ignore_errors=True)
+    print ("Directory deleted: "+dataSetPath)
+  else:
+      print ("Directory does not exist: "+dataSetPath)
 
 # def downloadDataSetFilesByDataSetRef(dataSetRef):

@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from io import StringIO
 
+from kaggleDownloader import getDataSetPath
 from utils.DataSetTypes import DataSetTypes
 
 def bash(command):

@@ -53,30 +53,33 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
     lastDataSetRef=None
     resultDataSetDict={}
     for filePath in tqdm(filePaths):
-        parentEntityType,parentEntityRef,entityRef,kernelFileName = getAllInfoFromKernelPath(filePath)
-        if(parentEntityRef is not None and parentEntityType is not None):
-            #Insert DB into dataset_info
-            currentDataSetChanged=parentEntityRef!=lastDataSetRef
-            currentDataSetChangedAndIsNoneForFirst=None if (lastDataSetRef is None) else currentDataSetChanged
-            if(currentDataSetChanged):
-                # print('INIT new DS: '+parentEntityRef)
-                # update DS db with dict
-                if(lastDataSetRef is not None and 'dataSetRef' in resultDataSetDict and len(resultDataSetDict.keys())>2):
-                    kernelAnalysersCloseDataSet(parentEntityType,resultDataSetDict,kernelAnalysersInstances)
-                    database.updateDataSetToDB(resultDataSetDict)
-                resultDataSetDict={
-                        'dataSetRef':parentEntityRef,'is_competition':getIsCompetitionfromEntityType(parentEntityType)
+        if os.path.exists(filePath):
+            parentEntityType,parentEntityRef,entityRef,kernelFileName = getAllInfoFromKernelPath(filePath)
+            if(parentEntityRef is not None and parentEntityType is not None):
+                #Insert DB into dataset_info
+                currentDataSetChanged=parentEntityRef!=lastDataSetRef
+                currentDataSetChangedAndIsNoneForFirst=None if (lastDataSetRef is None) else currentDataSetChanged
+                if(currentDataSetChanged):
+                    # print('INIT new DS: '+parentEntityRef)
+                    # update DS db with dict
+                    if(lastDataSetRef is not None and 'dataSetRef' in resultDataSetDict and len(resultDataSetDict.keys())>2):
+                        kernelAnalysersCloseDataSet(parentEntityType,resultDataSetDict,kernelAnalysersInstances)
+                        database.updateDataSetToDB(resultDataSetDict)
+                    resultDataSetDict={
+                            'dataSetRef':parentEntityRef,'is_competition':getIsCompetitionfromEntityType(parentEntityType)
+                    }
+                    # one time per DS analyse and update Dict
+                    database.insertDataBase(parentEntityRef,getIsCompetitionfromEntityType(parentEntityType))
+                    analyseDataSet(parentEntityRef,parentEntityType,resultDataSetDict,dataSetAnalysersInstances)
+                    lastDataSetRef=parentEntityRef
+                # insert KernelDB row directly and update DS dict if needed
+                resultKernelDict={
+                    'dataSetRef':parentEntityRef,'kernelRef':entityRef
                 }
-                # one time per DS analyse and update Dict
-                database.insertDataBase(parentEntityRef,getIsCompetitionfromEntityType(parentEntityType))
-                analyseDataSet(parentEntityRef,parentEntityType,resultDataSetDict,dataSetAnalysersInstances)
-                lastDataSetRef=parentEntityRef
-            # insert KernelDB row directly and update DS dict if needed
-            resultKernelDict={
-                'dataSetRef':parentEntityRef,'kernelRef':entityRef
-            }
-            analyseKernelFile(filePath,currentDataSetChangedAndIsNoneForFirst,resultKernelDict,resultDataSetDict,kernelAnalysersInstances)
-            database.insertKernel(resultKernelDict)
+                analyseKernelFile(filePath,currentDataSetChangedAndIsNoneForFirst,resultKernelDict,resultDataSetDict,kernelAnalysersInstances)
+                database.insertKernel(resultKernelDict)
+            else:
+                print('DataSet got deleted for kernel: '+kernelFileName)
     database.closeConnection()
 
 def analyseDataSet(dataSetRef,dataSetType,resultDataSetDict,dataSetAnalysersInstances=[]):

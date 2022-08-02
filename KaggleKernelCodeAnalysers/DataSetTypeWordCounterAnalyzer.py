@@ -21,11 +21,11 @@ class DataSetTypeWordCounterAnalyzer(KaggleKernelCodeAnalyzer):
         for typeRegex in regexArr:
           if re.search(typeRegex, sourceCell.strip().lower()) is not None:
             regExMatchCount=len(re.findall(typeRegex, sourceCell.strip().lower()))
-            # if(regExMatchCount>1):
-            if(dataSetType not in self._kernel_matches):
-              self._kernel_matches[dataSetType]=regExMatchCount
-            else:
-              self._kernel_matches[dataSetType]=+regExMatchCount
+            if(regExMatchCount>1):
+              if(dataSetType not in self._kernel_matches):
+                self._kernel_matches[dataSetType]=regExMatchCount
+              else:
+                self._kernel_matches[dataSetType]=+regExMatchCount
 
   def onLastCell(self):
     maxType=None

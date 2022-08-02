@@ -51,7 +51,7 @@ class DataSetTypeAnalyzer(KaggleKernelCodeAnalyzer):
         dataSetFinalCount=count
     if(dataSetFinalType is not None and self._kernel_count>30):
       countToOverAllRatio=dataSetFinalCount/self._kernel_count
-      typeCertainty=min(int(countToOverAllRatio*100),dataSetFinalType.getExtensionsCertanties())
+      typeCertainty=min(int(countToOverAllRatio*100),dataSetFinalType.getCodeTypeCertanties())
       setTypeAndCertainty(dataSetFinalType,typeCertainty,resultDataSetDict)
     self._type_vote_per_data_set={}
     self._kernel_count=0

@@ -162,6 +162,12 @@ def getAllKnownExtensions():
             'mp3',
             'rds',
             'jsonl',
-            'dicom'
+            'dicom',
+            'tiff',
+            'tfw',
+            '0',
+            'flac',
+            'mos',
+            'pb'
             ]
 
