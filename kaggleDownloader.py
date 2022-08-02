@@ -16,7 +16,7 @@ def getAllKernelsForKaggleMostVotedEntity(entity=KaggleEntityType.DATASET,page=1
     sortStr='--sort-by votes'
   elif(entity==KaggleEntityType.COMPETITION):
     sortStr='--sort-by numberOfTeams'
-  mostVotedEntityList = kaggleCommand2DF('kaggle '+getKaggleEntityString(entity,True)+' list '+sortStr + '--page '+str(page))
+  mostVotedEntityList = kaggleCommand2DF('kaggle '+getKaggleEntityString(entity,True)+' list -s tabular --page '+str(page))
   for currentDataSetRef in tqdm(list(mostVotedEntityList.iloc[:,0])):
     getKernelsByParentEntity('kaggle kernels list --sort-by voteCount --page-size '+str(kernelListPageSize)+' --'+getKaggleEntityString(entity)+' '+currentDataSetRef,currentDataSetRef,entity)
 
