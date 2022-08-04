@@ -64,8 +64,8 @@ def insertDataBase(dataSetRef,is_competition):
 def insertKernel(dataDict):
      sqlite_Insert_with_dict('kernel_info',dataDict)
 
-def getAllEntityRefs():
-    return execute_read_query("SELECT dataSetRef,is_competition FROM dataset_info")
+def getAllTabularEntityRefs():
+    return execute_read_query("SELECT dataSetRef,is_competition FROM dataset_info Where type='Tabular'")
 
 def updateDataSetToDB(data,primaryKey='dataSetRef'):
     if primaryKey in data and len(data.keys())>1:

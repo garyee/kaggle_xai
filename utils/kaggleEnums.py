@@ -6,7 +6,7 @@ class KaggleEntityType(Enum):
   COMPETITION = 2
   NONE = 3
 
-def getEntityTypeFromString(str):
+def getEntityTypeFromCompetitionInt(str):
     if(str==1):
         return KaggleEntityType.COMPETITION
     elif(str==0):

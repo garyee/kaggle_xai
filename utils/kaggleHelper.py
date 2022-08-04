@@ -4,6 +4,7 @@ from io import StringIO
 from utils.DataSetTypes import DataSetTypes
 
 def bash(command):
+    #can take long some times?
     output = os.popen(command).read()
     return output
 

@@ -93,27 +93,28 @@ def kernelAnalysersCloseDataSet(dataSetType,resultDataSetDict,kernelAnalysersIns
             kernelAnalyser.onDataSetChanged(resultDataSetDict)
     
 def analyseKernelFile(filePath,currentDataSetChanged,resultKernelDict,resultDataSetDict,kernelAnalysersInstances = []):
-    if os.stat(filePath).st_size == 0:
-        os.remove(filePath)
-        print(filePath+' was empty and thus removed!')
-        return
-    with open(filePath, encoding='utf-8') as f:
-        kernelCode={}
-        try:
-            kernelCode = json.load(f)
-        except ValueError as e:
-            print('Decoding JSON has failed for: '+filePath)
-        language=KernelLanguage.NONE
+    if os.path.exists(filePath):
+        if os.stat(filePath).st_size == 0:
+            os.remove(filePath)
+            print(filePath+' was empty and thus removed!')
+            return
+        with open(filePath, encoding='utf-8') as f:
+            kernelCode={}
+            try:
+                kernelCode = json.load(f)
+            except ValueError as e:
+                print('Decoding JSON has failed for: '+filePath)
+            language=KernelLanguage.NONE
 
-        # if hasattr(kernelCode['metadata'],'kernelspec'):
-        #   if hasattr(kernelCode['metadata']['kernelspec'], 'language'):
-        #     if kernelCode['metadata']['kernelspec']['language']=='python':
-        #       language=KernelLanguage.PYTHON
-        #   elif hasattr(kernelCode['metadata']['kernelspec'], 'name') and 'python' in kernelCode['metadata']['kernelspec']['name']:
-        #     language=KernelLanguage.PYTHON
-        if 'cells' in kernelCode:
-            for kernelAnalyser in kernelAnalysersInstances:
-                    kernelAnalyser.analyse(kernelCode['cells'])
+            # if hasattr(kernelCode['metadata'],'kernelspec'):
+            #   if hasattr(kernelCode['metadata']['kernelspec'], 'language'):
+            #     if kernelCode['metadata']['kernelspec']['language']=='python':
+            #       language=KernelLanguage.PYTHON
+            #   elif hasattr(kernelCode['metadata']['kernelspec'], 'name') and 'python' in kernelCode['metadata']['kernelspec']['name']:
+            #     language=KernelLanguage.PYTHON
+            if 'cells' in kernelCode:
+                for kernelAnalyser in kernelAnalysersInstances:
+                        kernelAnalyser.analyse(kernelCode['cells'])
 
 
 # analyseOneKernelFile('C:/Users/garyee/gDrive/Colab/Kaggle/kernels/datasets/kaggle_____meta-kaggle/benhamner_____predicting-which-scripts-get-votes/predicting-which-scripts-get-votes.ipynb')

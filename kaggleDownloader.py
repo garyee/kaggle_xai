@@ -1,10 +1,13 @@
 import os
 import re
 import shutil
+from utils.DataSetTypes import DataSetTypes
 from utils.kaggleEnums import tmpPath,KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef, isArchiveFile,kernelListPageSize,testKernelsRefs
 from utils.kaggleHelper import bash,kaggleCommand2DF
-#from tqdm.notebook import trange, tqdm
+#from tqdm.notebook import tqdm
 from tqdm import tqdm
+
+from utils.webStuff import acceptCompetitionRules, setupDriver, shutDownDriver
 
 def getTestKernels():
     for middleEntityType,kernelDict in testKernelsRefs.keys():
@@ -26,6 +29,7 @@ def getKernelsByParentEntity(commandStr,currentDataSetRef,entityType):
     kernelList4CurrDataSet = kaggleCommand2DF(commandStr)
     page=1
     i=0
+    # if(kernelList4CurrDataSet.shape[0]>30):
     pbar=tqdm(total=kernelList4CurrDataSet.shape[0])
     while kernelList4CurrDataSet.shape[0]!=i:
       currentKernelRef=kernelList4CurrDataSet.iloc[i,0]
@@ -70,20 +74,61 @@ def getDataSetPath(dataSetRef):
 
 def deleteDataSetFolder(dataSetRef):
   dataSetPath=getDataSetPath(dataSetRef)
-  if os.path.exists(dataSetPath):
-    shutil.rmtree(dataSetPath)
-    # shutil.rmtree(dataSetPath, ignore_errors=True)
+  if os.path.exists(dataSetPath) and os.access(dataSetPath, os.W_OK):
+    # shutil.rmtree(dataSetPath,ignore_errors=False,onerror=retryDeletingFile)
+    shutil.rmtree(dataSetPath,ignore_errors=True)
     print ("Directory deleted: "+dataSetPath)
   else:
-      print ("Directory does not exist: "+dataSetPath)
+      print ("Directory does not exist or is not accessable: "+dataSetPath)
+
+# def retryDeletingFile(func, path, exc):
+#   import stat
+#   # Is the error an access error?
+#   if not os.access(path, os.W_OK):
+#     os.chmod(path, stat.S_IWUSR)
+#     func(path)
+#   else:
+#     raise Exception('File could not be deleted even on second try: '+path)
+
+
 
 def downloadDataSetFilesByDataSetRef(dataSetRef,dataSetType =KaggleEntityType.DATASET):
   command ='kaggle '+getKaggleEntityString(dataSetType,True)+' files '+dataSetRef
   fileList = kaggleCommand2DF(command)
+  downloadedAtLeastOneFile=False
   for fileName in list(fileList.iloc[:,0]):
     isZip=isArchiveFile(fileName)
-    if re.match(r'.*train.*\..*', fileName.strip().lower()):
-      print(dataSetRef+' '+fileName)
+    if(fileName.strip().lower()=='train.csv'):
+      filePath=downloadOneFile(dataSetRef,dataSetType,fileName,isZip)
+      downloadedAtLeastOneFile=True
+      return filePath
+    # if re.match(r'.*train.*\..*', fileName.strip().lower()):
+    #   print(dataSetRef+' '+fileName)
+  if(not downloadedAtLeastOneFile):
+    print('No file found for: '+getKaggleEntityString(dataSetType)+' '+dataSetRef)
+  return None
 
-def downloadOneFile(dataSetRef,fileName,isZip):
-  bash('kaggle datasets download -f '+fileName+' -p '+tmpPath+''+('' if isZip else'--unzip')+' '+dataSetRef)
+def downloadOneFile(dataSetRef, dataSetType,fileName,isZip,accetanceTry=0):
+  tmpPath=getTmpPathforDataSetFile(dataSetRef)
+  if(not os.path.exists(tmpPath)):
+    os.mkdir(tmpPath)
+  res= bash('kaggle '+getKaggleEntityString(dataSetType,True)+' download -q -f '+fileName+' -p '+tmpPath+''+(' --unzip' if isZip else'')+' '+dataSetRef)
+  if '403 - Forbidden' in res:
+    if(dataSetType == KaggleEntityType.COMPETITION):
+      if(accetanceTry<6):
+        acceptCompetitionRules(dataSetRef)
+        downloadOneFile(dataSetRef, dataSetType,fileName,isZip,accetanceTry+1)
+      else:
+        raise Exception('Accept Rules attemps overflow: '+dataSetRef)
+  else:
+      #print('downloaded files for '+getKaggleEntityString(dataSetType)+' '+dataSetRef)
+      return getTmpPathforDataSetFile(dataSetRef)+fileName
+  return None
+
+def getTmpPathforDataSetFile(dataSetRef):
+  return tmpPath+getPathNameFromKaggleRef(dataSetRef)+"/"
+
+def deleteTrainFileDir(trainingfilePath):
+  if(trainingfilePath is not None):
+    parent_dir = os.path.dirname(trainingfilePath)
+    shutil.rmtree(parent_dir)
