@@ -7,42 +7,74 @@ from utils.kaggleHelper import bash,kaggleCommand2DF
 #from tqdm.notebook import tqdm
 from tqdm import tqdm
 
-from utils.webStuff import acceptCompetitionRules, setupDriver, shutDownDriver
+from utils.webStuff import acceptCompetitionRules
 
 def getTestKernels():
     for middleEntityType,kernelDict in testKernelsRefs.keys():
       for middleEntityRef,kernelRef in kernelDict.keys():
         downloadKernelByRef(kernelRef,middleEntityRef,middleEntityType)
 
-def getAllKernelsForKaggleMostVotedEntity(entity=KaggleEntityType.DATASET,page=1):
+def getAllKernelsForKaggleMostVotedEntity(entityType=KaggleEntityType.DATASET,page=1):
   sortStr=''
-  if(entity==KaggleEntityType.DATASET):
+  if(entityType==KaggleEntityType.DATASET):
     sortStr='--sort-by votes'
-  elif(entity==KaggleEntityType.COMPETITION):
+  elif(entityType==KaggleEntityType.COMPETITION):
     sortStr='--sort-by numberOfTeams'
-  mostVotedEntityList = kaggleCommand2DF('kaggle '+getKaggleEntityString(entity,True)+' list -s tabular --page '+str(page))
-  for currentDataSetRef in tqdm(list(mostVotedEntityList.iloc[:,0])):
-    getKernelsByParentEntity('kaggle kernels list --sort-by voteCount --page-size '+str(kernelListPageSize)+' --'+getKaggleEntityString(entity)+' '+currentDataSetRef,currentDataSetRef,entity)
+  commandStr='kaggle '+getKaggleEntityString(entityType,True)+' list -s tabular '
+  pagination(commandStr,kernelListPageSize,getKernelsByParentEntity,entityType)
+    
+  
+  # while kernelList4CurrDataSet.shape[0]!=i:
+  # while entityList.shape[0]!=i:
+  #   for currentDataSetRef in tqdm(list(mostVotedEntityList.iloc[:,0])):
+  #     getKernelsByParentEntity('tring(entityType)+' '+currentDataSetRef,currentDataSetRef,entityType)
 
-def getKernelsByParentEntity(commandStr,currentDataSetRef,entityType):
-    print(currentDataSetRef)
-    kernelList4CurrDataSet = kaggleCommand2DF(commandStr)
-    page=1
-    i=0
-    # if(kernelList4CurrDataSet.shape[0]>30):
-    pbar=tqdm(total=kernelList4CurrDataSet.shape[0])
-    while kernelList4CurrDataSet.shape[0]!=i:
-      currentKernelRef=kernelList4CurrDataSet.iloc[i,0]
-      status=downloadKernelByRef(currentKernelRef,currentDataSetRef,entityType)
-      # print(str(page)+'-'+str(kernelList4CurrDataSet.shape[0])+'-'+str(i)+': '+status)
-      pbar.update(1)
-      i+=1
-      if(i%kernelListPageSize==0):
-        pbar.refresh()
-        kernelList4CurrDataSet = kaggleCommand2DF('kaggle kernels list --language python --sort-by voteCount --page '+str(page)+' --page-size '+str(kernelListPageSize)+' --'+getKaggleEntityString(entityType)+' '+currentDataSetRef)
-        pbar.total = pbar.total+kernelList4CurrDataSet.shape[0]
-        i=0
-        page+=1
+def getKernelsByParentEntity(currentDataSetRef,entityType):
+    commandStr='kaggle kernels list --language python --sort-by voteCount'
+    commandPostFix= ' --'+getKaggleEntityString(entityType)+' '+currentDataSetRef
+    pagination(commandStr,kernelListPageSize,downloadKernelByRef,currentDataSetRef,entityType,currentDataSetRef,commandPostFix)
+    
+    # print(currentDataSetRef)
+    # kernelList4CurrDataSet = kaggleCommand2DF(commandStr)
+    # page=1
+    # i=0
+    # # if(kernelList4CurrDataSet.shape[0]>30):
+    # pbar=tqdm(total=kernelList4CurrDataSet.shape[0])
+    # while kernelList4CurrDataSet.shape[0]!=i:
+    #   currentKernelRef=kernelList4CurrDataSet.iloc[i,0]
+    #   status=downloadKernelByRef(currentKernelRef,currentDataSetRef,entityType)
+    #   # print(str(page)+'-'+str(kernelList4CurrDataSet.shape[0])+'-'+str(i)+': '+status)
+    #   pbar.update(1)
+    #   i+=1
+    #   if(i%kernelListPageSize==0):
+    #     pbar.refresh()
+    #     kernelList4CurrDataSet = kaggleCommand2DF('kaggle kernels list --language python --sort-by voteCount --page '+str(page)+' --page-size '+str(kernelListPageSize)+' --'+getKaggleEntityString(entityType)+' '+currentDataSetRef)
+    #     pbar.total = pbar.total+kernelList4CurrDataSet.shape[0]
+    #     i=0
+    #     page+=1
+    # pbar.close()
+
+def getCommandStr(original,page,pageSize,postfix=None):
+  tempCommandStr=original+' --page '+str(page)+' --page-size '+str(pageSize)
+  if(postfix is not None):
+    tempCommandStr=tempCommandStr+postfix
+
+def pagination(commandStr,listPageSize,callback,param1,param2=None,commandPostfix=None):
+  page=1
+  currentList = kaggleCommand2DF(getCommandStr(commandStr,page,listPageSize,commandPostfix))
+  i=0
+  pbar=tqdm(total=currentList.shape[0])
+  while currentList.shape[0]!=i:
+    # currentKernelRef=currentList.iloc[i,0]
+    callback(currentList.iloc[i,0],param1,param2)
+    pbar.update(1)
+    i+=1
+    if(i%listPageSize==0):
+      pbar.refresh()
+      currentList = kaggleCommand2DF(kaggleCommand2DF(getCommandStr(commandStr,page,listPageSize,commandPostfix)))
+      pbar.total = pbar.total+currentList.shape[0]
+      i=0
+      page+=1
     pbar.close()
 
 def downloadKernelByRef(kernelRef,parentEntitySetRef,parentEntityType=KaggleEntityType.DATASET):
