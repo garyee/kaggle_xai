@@ -43,9 +43,10 @@ def analyseAllKernels(dataSetAnalysers=[],kernelAnalysers = []):
 
 def intanciacteAnalysers(analysers,baseClass):
     returnArr=[]
-    for analyser in analysers:
-        if issubclass(analyser, baseClass ):
-            returnArr.append(analyser())
+    if(analysers):
+        for analyser in analysers:
+            if issubclass(analyser, baseClass ):
+                returnArr.append(analyser())
     return returnArr
 
 def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstances = []):
@@ -58,7 +59,6 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
             if(parentEntityRef is not None and parentEntityType is not None):
                 #Insert DB into dataset_info
                 currentDataSetChanged=parentEntityRef!=lastDataSetRef
-                currentDataSetChangedAndIsNoneForFirst=None if (lastDataSetRef is None) else currentDataSetChanged
                 if(currentDataSetChanged):
                     # print('INIT new DS: '+parentEntityRef)
                     # update DS db with dict
@@ -76,23 +76,23 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
                 resultKernelDict={
                     'dataSetRef':parentEntityRef,'kernelRef':entityRef
                 }
-                analyseKernelFile(filePath,currentDataSetChangedAndIsNoneForFirst,resultKernelDict,resultDataSetDict,kernelAnalysersInstances)
+                analyseKernelFile(filePath,resultKernelDict,kernelAnalysersInstances)
                 database.insertKernel(resultKernelDict)
             else:
                 print('DataSet got deleted for kernel: '+kernelFileName)
     database.closeConnection()
 
 def analyseDataSet(dataSetRef,dataSetType,resultDataSetDict,dataSetAnalysersInstances=[]):
-    if(dataSetType!=KaggleEntityType.NONE):
+    if(dataSetType!=KaggleEntityType.NONE and dataSetAnalysersInstances):
         for dataSetAnalyser in dataSetAnalysersInstances:
             dataSetAnalyser.analyse(dataSetRef,dataSetType,resultDataSetDict)
 
 def kernelAnalysersCloseDataSet(dataSetType,resultDataSetDict,kernelAnalysersInstances = []):
-    if(dataSetType!=KaggleEntityType.NONE):
+    if(dataSetType!=KaggleEntityType.NONE and kernelAnalysersInstances):
         for kernelAnalyser in kernelAnalysersInstances:
             kernelAnalyser.onDataSetChanged(resultDataSetDict)
     
-def analyseKernelFile(filePath,currentDataSetChanged,resultKernelDict,resultDataSetDict,kernelAnalysersInstances = []):
+def analyseKernelFile(filePath,resultKernelDict,kernelAnalysersInstances = []):
     if os.path.exists(filePath):
         if os.stat(filePath).st_size == 0:
             os.remove(filePath)
@@ -114,7 +114,7 @@ def analyseKernelFile(filePath,currentDataSetChanged,resultKernelDict,resultData
             #     language=KernelLanguage.PYTHON
             if 'cells' in kernelCode:
                 for kernelAnalyser in kernelAnalysersInstances:
-                        kernelAnalyser.analyse(kernelCode['cells'])
+                        kernelAnalyser.analyse(kernelCode['cells'],resultKernelDict)
 
 
 # analyseOneKernelFile('C:/Users/garyee/gDrive/Colab/Kaggle/kernels/datasets/kaggle_____meta-kaggle/benhamner_____predicting-which-scripts-get-votes/predicting-which-scripts-get-votes.ipynb')

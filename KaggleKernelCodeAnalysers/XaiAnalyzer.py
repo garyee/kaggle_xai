@@ -26,21 +26,23 @@ class XaiAnalyser(KaggleKernelCodeAnalyzer):
   "Anova": ["from skfda.inference.anova","from pyfanova.fanova", "from fanova"]
 }
 
-#   def getHeader():
-#     xaiMethodKeys=list(XaiAnalyser.explainableAITermesDict.keys())
-#     #xaiMethodKeys.append('filepath')
-#     return xaiMethodKeys
+  def __init__(self):
+    self._xaiMethodsResSet = {}
 
-  def analyseCell(self,sourceCell,isLastCell,currentDataSetChanged,resultKernelDict,resultDataSetDict):
-    matches={}
+  def analyseCell(self,sourceCell):
     for key,regularExpressions in XaiAnalyser.termsDict.items():
       for regex in regularExpressions:
           if re.search(re.compile(regex, re.S), sourceCell):
               if(key not in self.xaiMethodsResSet):
                   self.xaiMethodsResSet[key]=1
-              else:
-                  self.xaiMethodsResSet[key]=[key]
     # if(isLastCell):
       # typeVotePerDataSet['kernelRef']=KernelRef
       # database.insertOrUpdateKernelXAI
       # typeVotePerDataSet={}
+
+  def onLastCell(self,resultKernelDict):
+    database.addXAIMethodToKernelCreateColumnIfNeeded(self.xaiMethodsResSet,resultKernelDict['kernelRef'])
+    self.xaiMethodsResSet={}
+
+  def onDataSetChanged(self,resultDataSetDict):
+        pass

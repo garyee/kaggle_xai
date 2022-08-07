@@ -33,7 +33,6 @@ sql_create_kernel_info = """ CREATE TABLE IF NOT EXISTS kernel_info (
 sql_create_xai_methods = """ CREATE TABLE IF NOT EXISTS kernel_xai (
                                     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                                     kernelRef text NOT NULL,
-                                    hasBlackBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
                                     CONSTRAINT fk_kernelRef
                                         FOREIGN KEY (kernelRef)
                                         REFERENCES kernel_info (kernelRef)
@@ -102,6 +101,10 @@ def sqlite_update_with_dict(table,primaryKeyName, data, connection=None):
         cursor.execute(query, list(data.values()) + [primaryKeyValue])
     except Error as e:
         print(f"The error '{e}' occurred")
+
+def insertOrUpdateWithDict(table,primaryKeyName, data, connection=None):
+    sqlite_Insert_with_dict(table, data, connection)
+    sqlite_update_with_dict(table,primaryKeyName, data, connection)
 
 def execute_many(query,data,connection=None,silent=True):
     global currentConnection
@@ -174,3 +177,32 @@ def closeConnection():
         currentConnection.close()
         currentConnection=None
 
+def getColList(tableName):
+    query=("PRAGMA table_info("+tableName+")")
+    colNameListFromTable= execute_read_query(query)
+    return [fields[1] for fields in colNameListFromTable]
+
+def checkIfColExists(tableName,colNames):
+    colsNotInTable=[]
+    colNameListFromTable= getColList(tableName)
+    for colName in colNames:
+        if(colName not in colNameListFromTable):
+            colsNotInTable.append(colName)
+    return colsNotInTable
+
+def addXAIColToDB(xaiMethodKey):
+    query=f"""
+            ALTER TABLE kernel_xai 
+            ADD COLUMN {xaiMethodKey} BOOLEAN NOT NULL constraint {xaiMethodKey}_bool_constraint CHECK ({xaiMethodKey} IN (0, 1)) DEFAULT 0
+            """
+    execute_write_query(query)
+        
+def addXAIMethodToKernelCreateColumnIfNeeded(xaiMethodDict,kernelRef):
+    xaiMethodList=list(xaiMethodDict.keys())
+    if len(xaiMethodList)>0:
+        colsNotInTable =checkIfColExists('kernel_xai',xaiMethodList)
+        xaiMethodDict['kernelRef']=kernelRef
+        if(len(colsNotInTable)>0):
+            for nonexistingColNames in colsNotInTable:
+                addXAIColToDB(nonexistingColNames)
+        insertOrUpdateWithDict('kernel_xai','kernelRef',xaiMethodDict)
