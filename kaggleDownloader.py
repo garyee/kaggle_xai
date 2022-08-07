@@ -2,7 +2,7 @@ import os
 import re
 import shutil
 from utils.DataSetTypes import DataSetTypes
-from utils.kaggleEnums import tmpPath,KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef, isArchiveFile,kernelListPageSize,testKernelsRefs
+from utils.kaggleEnums import tmpPath,KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef, isArchiveFile,testKernelsRefs
 from utils.kaggleHelper import bash,kaggleCommand2DF
 #from tqdm.notebook import tqdm
 from tqdm import tqdm
@@ -20,8 +20,8 @@ def getAllKernelsForKaggleMostVotedEntity(entityType=KaggleEntityType.DATASET,pa
     sortStr='--sort-by votes'
   elif(entityType==KaggleEntityType.COMPETITION):
     sortStr='--sort-by numberOfTeams'
-  commandStr='kaggle '+getKaggleEntityString(entityType,True)+' list -s tabular '
-  pagination(commandStr,kernelListPageSize,getKernelsByParentEntity,entityType)
+  commandStr='kaggle '+getKaggleEntityString(entityType,True)+' list -s tabular'
+  pagination(commandStr,getKernelsByParentEntity,entityType.getPageSize(),entityType)
     
   
   # while kernelList4CurrDataSet.shape[0]!=i:
@@ -29,10 +29,9 @@ def getAllKernelsForKaggleMostVotedEntity(entityType=KaggleEntityType.DATASET,pa
   #   for currentDataSetRef in tqdm(list(mostVotedEntityList.iloc[:,0])):
   #     getKernelsByParentEntity('tring(entityType)+' '+currentDataSetRef,currentDataSetRef,entityType)
 
-def getKernelsByParentEntity(currentDataSetRef,entityType):
-    commandStr='kaggle kernels list --language python --sort-by voteCount'
-    commandPostFix= ' --'+getKaggleEntityString(entityType)+' '+currentDataSetRef
-    pagination(commandStr,kernelListPageSize,downloadKernelByRef,currentDataSetRef,entityType,currentDataSetRef,commandPostFix)
+def getKernelsByParentEntity(currentDataSetRef,entityType,_=None):
+    commandStr='kaggle kernels list --language python --sort-by voteCount --'+getKaggleEntityString(entityType)+' '+currentDataSetRef
+    pagination(commandStr,downloadKernelByRef,KaggleEntityType.KERNEL.getPageSize(),currentDataSetRef,entityType)
     
     # print(currentDataSetRef)
     # kernelList4CurrDataSet = kaggleCommand2DF(commandStr)
@@ -54,14 +53,15 @@ def getKernelsByParentEntity(currentDataSetRef,entityType):
     #     page+=1
     # pbar.close()
 
-def getCommandStr(original,page,pageSize,postfix=None):
-  tempCommandStr=original+' --page '+str(page)+' --page-size '+str(pageSize)
-  if(postfix is not None):
-    tempCommandStr=tempCommandStr+postfix
+def getCommandStr(original,page,pageSize):
+  tempCommandStr=original+' --page '+str(page)
+  if(pageSize>20):
+    tempCommandStr+=' --page-size '+str(pageSize)
+  return tempCommandStr
 
-def pagination(commandStr,listPageSize,callback,param1,param2=None,commandPostfix=None):
+def pagination(commandStr,callback,entityTypePageSize,param1,param2=None):
   page=1
-  currentList = kaggleCommand2DF(getCommandStr(commandStr,page,listPageSize,commandPostfix))
+  currentList = kaggleCommand2DF(getCommandStr(commandStr,page,entityTypePageSize))
   i=0
   pbar=tqdm(total=currentList.shape[0])
   while currentList.shape[0]!=i:
@@ -69,9 +69,9 @@ def pagination(commandStr,listPageSize,callback,param1,param2=None,commandPostfi
     callback(currentList.iloc[i,0],param1,param2)
     pbar.update(1)
     i+=1
-    if(i%listPageSize==0):
+    if(i%entityTypePageSize==0):
       pbar.refresh()
-      currentList = kaggleCommand2DF(kaggleCommand2DF(getCommandStr(commandStr,page,listPageSize,commandPostfix)))
+      currentList = kaggleCommand2DF(kaggleCommand2DF(getCommandStr(commandStr,page,entityTypePageSize)))
       pbar.total = pbar.total+currentList.shape[0]
       i=0
       page+=1
@@ -81,11 +81,10 @@ def downloadKernelByRef(kernelRef,parentEntitySetRef,parentEntityType=KaggleEnti
   path4currentKernel=getKernelPath(kernelRef,parentEntitySetRef,parentEntityType)
   if(not os.path.exists(path4currentKernel)):
     res=bash('kaggle kernels pull '+kernelRef+' -p '+path4currentKernel)
-  #   print(res)
-    return "downloaded"
+    # if 'Source code downloaded' not in res:
+    #   if('404 - Not Found' in res:
   else:
-  #   print('skipped '+currentKernelRef)
-    return "skipped"
+    print('skipped '+kernelRef)
 
 def getKernelPath(kernelRef,middleEntityRef='',parentEntityType=KaggleEntityType.DATASET):
   kernelRefDirName=getPathNameFromKaggleRef(kernelRef)
@@ -164,3 +163,5 @@ def deleteTrainFileDir(trainingfilePath):
   if(trainingfilePath is not None):
     parent_dir = os.path.dirname(trainingfilePath)
     shutil.rmtree(parent_dir)
+
+getAllKernelsForKaggleMostVotedEntity(KaggleEntityType.DATASET,34)

@@ -4,8 +4,20 @@ import os
 class KaggleEntityType(Enum):
   DATASET = 1
   COMPETITION = 2
-  NONE = 3
+  KERNEL = 3
+  NONE = 4
 
+  def getPageSize(self=None):
+    pageSizeArray= {
+      KaggleEntityType.DATASET: 20,
+      KaggleEntityType.COMPETITION: 20,
+      KaggleEntityType.KERNEL:100,
+      KaggleEntityType.NONE:0,
+    }
+    if(self is None):
+      return pageSizeArray
+    return pageSizeArray[self]
+    
 def getEntityTypeFromCompetitionInt(str):
     if(str==1):
         return KaggleEntityType.COMPETITION
@@ -21,8 +33,6 @@ def getIsCompetitionfromEntityType(type):
 class KernelLanguage(Enum):
   PYTHON = 1
   NONE = 2
-
-kernelListPageSize=100
 
 testKernelsRefs={KaggleEntityType.DATASET: {},
                  KaggleEntityType.COMPETITION:{
