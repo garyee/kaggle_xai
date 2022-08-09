@@ -78,6 +78,11 @@ def getKaggleEntityString(entity,multiple=False):
       return 'competitions'
     else:
       return 'competition'
+  elif entity==KaggleEntityType.KERNEL:
+    if multiple:
+      return 'kernels'
+    else:
+      return 'kernel'
   return ''
 
 def getKaggleEntityTypeFromString(entityStr):

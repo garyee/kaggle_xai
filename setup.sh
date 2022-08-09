@@ -1,4 +1,5 @@
 pip install --upgrade --force-reinstall  -q  kaggle
+pip install selenium
 mkdir ~/.kaggle
 cp /content/drive/MyDrive/Colab/Kaggle/kaggle.json ~/.kaggle/
 chmod 600 ~/.kaggle/kaggle.json
