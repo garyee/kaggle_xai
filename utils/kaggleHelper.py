@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from io import StringIO
 from utils.DataSetTypes import DataSetTypes
+from utils.DownloaderErrors import PageDoesNotExistError
 import subprocess
 
 def bash(command):
@@ -14,6 +15,8 @@ def bash(command):
 
 def kaggleCommand2DF(command):
   result=bash(command+" --csv")
+  if('No datasets found' in result or 'No kernels found' in result):
+    raise PageDoesNotExistError(command)
   return pd.read_csv(StringIO(result))
 
 def setTypeAndCertainty(type,typeCertainty,resDict):
