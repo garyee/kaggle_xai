@@ -49,12 +49,12 @@ parentEntityPathStrList=['datasets','competitions','none']
 #filePath= '/content/drive/MyDrive/Colab'
 filePath="C:/Users/garyee/gDrive/Colab/Kaggle/"
 basePath= filePath+'kernels/'
-tmpPath= filePath+'tmp/'
+baseTmpPath= filePath+'tmp/'
 
 if(not os.path.exists(basePath)):
   os.mkdir(basePath)
-if(not os.path.exists(tmpPath)):
-  os.mkdir(tmpPath)
+if(not os.path.exists(baseTmpPath)):
+  os.mkdir(baseTmpPath)
 
 basePathPerDataSet= basePath+'datasets'
 basePathPerCompetitions= basePath+'competitions'

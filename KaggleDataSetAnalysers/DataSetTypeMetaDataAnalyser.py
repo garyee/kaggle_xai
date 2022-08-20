@@ -2,7 +2,7 @@ import json
 import os
 import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
-from kaggleDownloader import getDataSetPath
+from Downloaders.kaggleCodeDownloader import getDataSetPath
 from utils.kaggleEnums import metaDataGoal, KaggleEntityType, getKaggleRefFromFilePathPartStr
 from utils.DataSetTypes import DataSetTypes
 from utils.kaggleHelper import bash, setTypeAndCertainty

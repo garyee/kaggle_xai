@@ -5,7 +5,7 @@ import json
 from KaggleDataSetAnalysers.DataSetTypeFileListAnalyser import DataSetTypeFileListAnalyser
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
 from utils.kaggleEnums import basePath,KaggleEntityType, KernelLanguage, getAllInfoFromKernelPath, getIsCompetitionfromEntityType, testKernelsRefs
-from kaggleDownloader import downloadKernelByRef,getKernelPath
+from Downloaders.kaggleCodeDownloader import downloadKernelByRef,getKernelPath
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
 import utils.database as database
 

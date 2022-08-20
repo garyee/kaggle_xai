@@ -3,7 +3,7 @@ import re
 import shutil
 from utils.DataSetTypes import DataSetTypes
 from utils.DownloaderErrors import PageDoesNotExistError
-from utils.kaggleEnums import tmpPath,KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef, isArchiveFile,testKernelsRefs
+from utils.kaggleEnums import KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef, testKernelsRefs
 from utils.kaggleHelper import bash,kaggleCommand2DF
 #from tqdm.notebook import tqdm
 from tqdm import tqdm
@@ -22,7 +22,7 @@ def getAllKernelsForKaggleMostVotedEntity(entityType=KaggleEntityType.DATASET,pa
   elif(entityType==KaggleEntityType.COMPETITION):
     sortStr='--sort-by numberOfTeams'
   commandStr='kaggle '+getKaggleEntityString(entityType,True)+' list -s tabular'
-  pagination(commandStr,getKernelsByParentEntity,entityType,entityType,page)
+  pagination(commandStr,getKernelsByParentEntity,entityType,entityType,None,page)
   
 def getKernelsByParentEntity(currentDataSetRef,entityType,_=None):
     commandStr='kaggle kernels list --language python --sort-by voteCount --'+getKaggleEntityString(entityType)+' '+currentDataSetRef
@@ -36,7 +36,10 @@ def getCommandStr(original,page,pageSize):
 
 def pagination(commandStr,callback,paginatedType,param1,param2=None,startPage=1):
   page=startPage
-  currentList = kaggleCommand2DF(getCommandStr(commandStr,page,paginatedType.getPageSize()))
+  try:
+    currentList = kaggleCommand2DF(getCommandStr(commandStr,page,paginatedType.getPageSize()))
+  except PageDoesNotExistError:
+    return
   i=0
   pbar=tqdm(total=currentList.shape[0])
   while i<currentList.shape[0]:
@@ -100,47 +103,3 @@ def deleteDataSetFolder(dataSetRef):
 #   else:
 #     raise Exception('File could not be deleted even on second try: '+path)
 
-
-
-def downloadDataSetFilesByDataSetRef(dataSetRef,dataSetType =KaggleEntityType.DATASET):
-  command ='kaggle '+getKaggleEntityString(dataSetType,True)+' files '+dataSetRef
-  fileList = kaggleCommand2DF(command)
-  downloadedAtLeastOneFile=False
-  for fileName in list(fileList.iloc[:,0]):
-    isZip=isArchiveFile(fileName)
-    if(fileName.strip().lower()=='train.csv'):
-      filePath=downloadOneFile(dataSetRef,dataSetType,fileName,isZip)
-      downloadedAtLeastOneFile=True
-      return filePath
-    # if re.match(r'.*train.*\..*', fileName.strip().lower()):
-    #   print(dataSetRef+' '+fileName)
-  if(not downloadedAtLeastOneFile):
-    print('No file found for: '+getKaggleEntityString(dataSetType)+' '+dataSetRef)
-  return None
-
-def downloadOneFile(dataSetRef, dataSetType,fileName,isZip,accetanceTry=0):
-  tmpPath=getTmpPathforDataSetFile(dataSetRef)
-  if(not os.path.exists(tmpPath)):
-    os.mkdir(tmpPath)
-  res= bash('kaggle '+getKaggleEntityString(dataSetType,True)+' download -q -f '+fileName+' -p '+tmpPath+''+(' --unzip' if isZip else'')+' '+dataSetRef)
-  if '403 - Forbidden' in res:
-    if(dataSetType == KaggleEntityType.COMPETITION):
-      if(accetanceTry<6):
-        acceptCompetitionRules(dataSetRef)
-        downloadOneFile(dataSetRef, dataSetType,fileName,isZip,accetanceTry+1)
-      else:
-        raise Exception('Accept Rules attemps overflow: '+dataSetRef)
-  else:
-      #print('downloaded files for '+getKaggleEntityString(dataSetType)+' '+dataSetRef)
-      return getTmpPathforDataSetFile(dataSetRef)+fileName
-  return None
-
-def getTmpPathforDataSetFile(dataSetRef):
-  return tmpPath+getPathNameFromKaggleRef(dataSetRef)+"/"
-
-def deleteTrainFileDir(trainingfilePath):
-  if(trainingfilePath is not None):
-    parent_dir = os.path.dirname(trainingfilePath)
-    shutil.rmtree(parent_dir)
-
-getAllKernelsForKaggleMostVotedEntity()

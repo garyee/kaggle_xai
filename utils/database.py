@@ -1,5 +1,5 @@
 from sqlite3 import connect, Error
-from kaggleDownloader import deleteDataSetFolder
+from Downloaders.kaggleCodeDownloader import deleteDataSetFolder
 from utils.kaggleEnums import KaggleEntityType, filePath, getIsCompetitionfromEntityType
 
 databasePath = filePath+"kaggleSqlite.db"
