@@ -27,7 +27,7 @@ class DataSetTypeWordCounterAnalyzer(KaggleKernelCodeAnalyzer):
               else:
                 self._kernel_matches[dataSetType]=+regExMatchCount
 
-  def onLastCell(self):
+  def onLastCell(self,resultKernelDict):
     maxType=None
     maxCount=0
     for dataType, count in self._kernel_matches.items():

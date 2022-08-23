@@ -1,24 +1,50 @@
 import os
 import shutil
-from utils.kaggleEnums import baseTmpPath,KaggleEntityType, getKaggleEntityString, getPathNameFromKaggleRef, isArchiveFile
+import pandas as pd
+from utils.DataSetTypes import DataSetTypes
+from utils.kaggleEnums import compressionExtensions,baseTmpPath,KaggleEntityType, getKaggleEntityString, getPathNameFromKaggleRef, isArchiveFile
 from utils.kaggleHelper import bash,kaggleCommand2DF
 from utils.webStuff import acceptCompetitionRules
 
-def downloadDataSetFilesByDataSetRef(dataSetRef,dataSetType =KaggleEntityType.DATASET):
-  command ='kaggle '+getKaggleEntityString(dataSetType,True)+' files '+dataSetRef
-  fileList = kaggleCommand2DF(command)
-  downloadedAtLeastOneFile=False
-  for fileName in list(fileList.iloc[:,0]):
-    isZip=isArchiveFile(fileName)
-    if(fileName.strip().lower()=='train.csv'):
-      filePath=downloadOneFile(dataSetRef,dataSetType,fileName,isZip)
-      downloadedAtLeastOneFile=True
-      return filePath
-    # if re.match(r'.*train.*\..*', fileName.strip().lower()):
-    #   print(dataSetRef+' '+fileName)
-  if(not downloadedAtLeastOneFile):
-    print('No file found for: '+getKaggleEntityString(dataSetType)+' '+dataSetRef)
-  return None
+def getFileListByDataSetRef(dataSetRef,dataSetType =KaggleEntityType.DATASET):
+    command ='kaggle '+getKaggleEntityString(dataSetType,True)+' files '+dataSetRef
+    fileList = kaggleCommand2DF(command)
+    return list(fileList.iloc[:,0])
+
+
+def getTrainingFileName(fileList):
+    res=None
+    countTableFiles=0
+    lastTableFileName=None
+    downloadedAtLeastOneFile=False
+    #simple train.csv case
+    if('train.csv' in fileList):
+        return 'train.csv'
+    #there is only one file case
+    if(len(fileList)==1):
+        return fileList[0]
+    #iterate fileList
+    for fullfileName in fileList:
+        #imediat return in case of train.csv
+        filename, file_extension = os.path.splitext(fullfileName)
+        if(filename.strip().lower()=='train'):
+            return fullfileName
+        if(isArchiveFile(fullfileName) and (filename=='train' or filename=='train.csv')):
+            return fullfileName
+        if(file_extension in  DataSetTypes.TABULAR.getExtensions()):
+            countTableFiles+=1
+    if(countTableFiles==1 and lastTableFileName is not None):
+        return lastTableFileName
+    return None
+
+def getTrainingFileAsDataframe(dataSetRef,dataSetType,fileName):
+    filePath=downloadOneFile(dataSetRef,dataSetType,fileName)
+    dataframe=openFileToDataframe(filePath)
+    return filePath,dataframe
+
+def openFileToDataframe():
+    #TODO
+    return pd.DataFrame([])
 
 def downloadOneFile(dataSetRef, dataSetType,fileName,isZip,accetanceTry=0):
   tmpPath=getTmpPathforDataSetFile(dataSetRef)

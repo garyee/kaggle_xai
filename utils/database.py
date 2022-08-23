@@ -15,6 +15,7 @@ sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     tab_features_total INTEGER NULL DEFAULT NULL,
                                     tab_cat_features INTEGER NULL DEFAULT NULL,
                                     tab_num_features INTEGER NULL DEFAULT NULL,
+                                    tab_target_col TEXT DEFAULT NULL,
                                     tab_goal text constraint enum_tab_goal CHECK (tab_goal IN ('classification','regression','misc')) DEFAULT NULL
                                 ); """
 
@@ -63,8 +64,14 @@ def insertDataBase(dataSetRef,is_competition):
 def insertKernel(dataDict):
      sqlite_Insert_with_dict('kernel_info',dataDict)
 
-def getAllTabularEntityRefs():
+def getAllTabularDatabaseRefs():
     return execute_read_query("SELECT dataSetRef,is_competition FROM dataset_info Where type='Tabular'")
+
+def getAllTabularKernelsRefs():
+    return execute_read_query("""SELECT kernelRef,kernel_info.dataSetRef,is_competition
+        FROM kernel_info
+        INNER JOIN dataset_info ON kernel_info.dataSetRef=dataset_info.dataSetRef
+        Where dataset_info.type='Tabular';""")
 
 def updateDataSetToDB(data,primaryKey='dataSetRef'):
     if primaryKey in data and len(data.keys())>1:

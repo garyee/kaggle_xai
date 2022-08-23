@@ -120,7 +120,10 @@ def getAllInfoFromKernelPath(filePath):
     return
   return parentEntityType,parentEntityRef,entityRef,kernelFileName
   
-
+def getKernelPathfromRef(ref,parentRef,parentType):
+  basePath=getKaggleEntityBasePath(parentType)
+  return basePath+'/'+getPathNameFromKaggleRef(parentRef)+'/'+getPathNameFromKaggleRef(ref)+'/'
+  
 
 def getKaggleEntityBasePath(entityType=KaggleEntityType.DATASET):
   if entityType==KaggleEntityType.COMPETITION:

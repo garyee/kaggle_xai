@@ -4,7 +4,7 @@ from tqdm import tqdm
 import json
 from KaggleDataSetAnalysers.DataSetTypeFileListAnalyser import DataSetTypeFileListAnalyser
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
-from utils.kaggleEnums import basePath,KaggleEntityType, KernelLanguage, getAllInfoFromKernelPath, getIsCompetitionfromEntityType, testKernelsRefs
+from utils.kaggleEnums import basePath,KaggleEntityType, KernelLanguage, getAllInfoFromKernelPath, getEntityTypeFromCompetitionInt, getIsCompetitionfromEntityType, getKernelPathfromRef, testKernelsRefs
 from Downloaders.kaggleCodeDownloader import downloadKernelByRef,getKernelPath
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
 import utils.database as database
@@ -15,16 +15,28 @@ def getTestKernelFiles():
         if(len(kernelInfoDict)>0):
             for middleEntityRef, kernelRef in kernelInfoDict.items():
                 downloadKernelByRef(kernelRef,middleEntityRef,entityType)
-                matches += getAllFilePaths(getKernelPath(kernelRef,middleEntityRef,entityType))
+                matches += getAllNoteBooksInPath(getKernelPath(kernelRef,middleEntityRef,entityType))
     return matches
 
-def getAllFilePaths(directory=basePath):
+def getAllNoteBooksInPath(directory=basePath):
     matches = []
     for subdir, dirs, files in os.walk(directory):
         for file in files:
           if(file.endswith('ipynb')):
             matches.append(os.path.join(subdir, file).replace("\\\\","/").replace("\\","/"))
     return matches
+
+def getAllTabularKernels():
+    database.initConnection()
+    kernelRefs=database.getAllTabularKernelsRefs()
+    res=[]
+    for kernelRef,dataSetRef,is_competition in tqdm(kernelRefs):
+        kernelPath=getKernelPathfromRef(kernelRef,dataSetRef,getEntityTypeFromCompetitionInt(is_competition))
+        noteBookPaths=getAllNoteBooksInPath(kernelPath)
+        if(len(noteBookPaths)>0):
+            res.append(noteBookPaths[0])
+    database.closeConnection()
+    return res
 
 def merge_two_dicts(x, y):
     if(len(x)==0):
@@ -39,7 +51,10 @@ def analyseTestKernels():
     return anaylseKernels(getTestKernelFiles())
 
 def analyseAllKernels(dataSetAnalysers=[],kernelAnalysers = []):
-    return anaylseKernels(getAllFilePaths(),intanciacteAnalysers(dataSetAnalysers,KaggleDataSetAnalyser),intanciacteAnalysers(kernelAnalysers,KaggleKernelCodeAnalyzer))
+    return anaylseKernels(getAllNoteBooksInPath(),intanciacteAnalysers(dataSetAnalysers,KaggleDataSetAnalyser),intanciacteAnalysers(kernelAnalysers,KaggleKernelCodeAnalyzer))
+
+def analyseAllTabularKernels(dataSetAnalysers=[],kernelAnalysers = []):
+    return anaylseKernels(getAllTabularKernels(),intanciacteAnalysers(dataSetAnalysers,KaggleDataSetAnalyser),intanciacteAnalysers(kernelAnalysers,KaggleKernelCodeAnalyzer))
 
 def intanciacteAnalysers(analysers,baseClass):
     returnArr=[]
@@ -62,8 +77,8 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
                 if(currentDataSetChanged):
                     # print('INIT new DS: '+parentEntityRef)
                     # update DS db with dict
+                    kernelAnalysersCloseDataSet(parentEntityType,resultDataSetDict,kernelAnalysersInstances)
                     if(lastDataSetRef is not None and 'dataSetRef' in resultDataSetDict and len(resultDataSetDict.keys())>2):
-                        kernelAnalysersCloseDataSet(parentEntityType,resultDataSetDict,kernelAnalysersInstances)
                         database.updateDataSetToDB(resultDataSetDict)
                     resultDataSetDict={
                             'dataSetRef':parentEntityRef,'is_competition':getIsCompetitionfromEntityType(parentEntityType)
