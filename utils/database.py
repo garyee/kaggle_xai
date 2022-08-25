@@ -16,12 +16,15 @@ sql_create_dataset_info = """ CREATE TABLE IF NOT EXISTS dataset_info (
                                     tab_cat_features INTEGER NULL DEFAULT NULL,
                                     tab_num_features INTEGER NULL DEFAULT NULL,
                                     tab_target_col TEXT DEFAULT NULL,
+                                    tab_has_target_propability INTEGER NULL DEFAULT NULL,
                                     tab_goal text constraint enum_tab_goal CHECK (tab_goal IN ('classification','regression','misc')) DEFAULT NULL
                                 ); """
 
 sql_create_kernel_info = """ CREATE TABLE IF NOT EXISTS kernel_info (
                                     kernelRef text NOT NULL PRIMARY KEY,
                                     dataSetRef text NOT NULL,
+                                    modelsTrained INTEGER NULL DEFAULT NULL,
+                                    predictionsMade INTEGER NULL DEFAULT NULL,
                                     hasBlackBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
                                     hasGlassBoxModel BOOLEAN NOT NULL CHECK (hasBlackBoxModel IN (0, 1)) DEFAULT 0,
                                     Performance REAL NULL DEFAULT NULL,

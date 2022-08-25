@@ -15,15 +15,15 @@ class KaggleKernelCodeAnalyzer(ABC):
 
   @classmethod
   @abstractmethod
-  def onDataSetChanged(self,resultDataSetDict):
+  def onDataSetChanged(self,resultDataSetDict,kernelCountPerDataSet):
         pass
   
   @classmethod
   @abstractmethod
-  def onLastCell(self,resultKernelDict):
+  def onLastCell(self,resultKernelDict,kernelIndex):
         pass
 
-  def analyse(self,cells,resultKernelDict):
+  def analyse(self,cells,resultKernelDict,kernelIndex):
     #datasetChanges occur right before the first kernel of the new one
     indexOfLastSourceCell=None
     if(len(self.CELLTYPEFILTERARR)>0):
@@ -43,5 +43,5 @@ class KaggleKernelCodeAnalyzer(ABC):
           if type(cell['source']) == str:
             self.analyseCell(cell['source'])
       if(isLastCell):
-        self.onLastCell(resultKernelDict)
+        self.onLastCell(resultKernelDict,kernelIndex)
         break

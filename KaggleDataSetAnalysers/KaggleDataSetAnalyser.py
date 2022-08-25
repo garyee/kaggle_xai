@@ -9,5 +9,5 @@ class KaggleDataSetAnalyser(ABC):
 
   @classmethod
   @abstractmethod
-  def analyse(self,entityRef,entityType,resDict):
+  def analyse(self,entityRef,entityType,resDict,kernelCountPerDataSet):
         pass

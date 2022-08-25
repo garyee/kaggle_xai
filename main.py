@@ -8,8 +8,8 @@ from kaggleKernelAnalyser import analyseAllKernels, analyseAllTabularKernels
 from utils.DataSetTypes import DataSetTypes
 
 def fillDatabase():
-    analyseAllKernels(
-        dataSetAnalysers=[DataSetTypeFileListAnalyser,DataSetTypeMetaDataAnalyser],
-        kernelAnalysers=[DataSetTypeAnalyzer,DataSetTypeWordCounterAnalyzer,XaiAnalyser])
+    # analyseAllKernels(
+    #     dataSetAnalysers=[DataSetTypeFileListAnalyser,DataSetTypeMetaDataAnalyser],
+    #     kernelAnalysers=[DataSetTypeAnalyzer,DataSetTypeWordCounterAnalyzer,XaiAnalyser])
     analyseAllTabularKernels(kernelAnalysers=[DataSetTargetColumnNameFinder])
 fillDatabase()

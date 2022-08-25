@@ -40,9 +40,9 @@ class XaiAnalyser(KaggleKernelCodeAnalyzer):
       # database.insertOrUpdateKernelXAI
       # typeVotePerDataSet={}
 
-  def onLastCell(self,resultKernelDict):
+  def onLastCell(self,resultKernelDict,kernelIndex):
     database.addXAIMethodToKernelCreateColumnIfNeeded(self.xaiMethodsResSet,resultKernelDict['kernelRef'])
     self.xaiMethodsResSet={}
 
-  def onDataSetChanged(self,resultDataSetDict):
+  def onDataSetChanged(self,resultDataSetDict,kernelCountPerDataSet):
         pass

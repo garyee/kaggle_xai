@@ -68,8 +68,10 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
     database.initConnection()
     lastDataSetRef=None
     resultDataSetDict={}
+    kernelCountPerDataSet=0
     for filePath in tqdm(filePaths):
         if os.path.exists(filePath):
+            kernelCountPerDataSet+=1
             parentEntityType,parentEntityRef,entityRef,kernelFileName = getAllInfoFromKernelPath(filePath)
             if(parentEntityRef is not None and parentEntityType is not None):
                 #Insert DB into dataset_info
@@ -77,7 +79,8 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
                 if(currentDataSetChanged):
                     # print('INIT new DS: '+parentEntityRef)
                     # update DS db with dict
-                    kernelAnalysersCloseDataSet(parentEntityType,resultDataSetDict,kernelAnalysersInstances)
+                    kernelAnalysersCloseDataSet(parentEntityType,resultDataSetDict,kernelCountPerDataSet,kernelAnalysersInstances)
+                    kernelCountPerDataSet=0
                     if(lastDataSetRef is not None and 'dataSetRef' in resultDataSetDict and len(resultDataSetDict.keys())>2):
                         database.updateDataSetToDB(resultDataSetDict)
                     resultDataSetDict={
@@ -85,29 +88,29 @@ def anaylseKernels(filePaths,dataSetAnalysersInstances=[],kernelAnalysersInstanc
                     }
                     # one time per DS analyse and update Dict
                     database.insertDataBase(parentEntityRef,getIsCompetitionfromEntityType(parentEntityType))
-                    analyseDataSet(parentEntityRef,parentEntityType,resultDataSetDict,dataSetAnalysersInstances)
+                    analyseDataSet(parentEntityRef,parentEntityType,resultDataSetDict,kernelCountPerDataSet,dataSetAnalysersInstances)
                     lastDataSetRef=parentEntityRef
                 # insert KernelDB row directly and update DS dict if needed
                 resultKernelDict={
                     'dataSetRef':parentEntityRef,'kernelRef':entityRef
                 }
-                analyseKernelFile(filePath,resultKernelDict,kernelAnalysersInstances)
+                analyseKernelFile(filePath,resultKernelDict,kernelCountPerDataSet,kernelAnalysersInstances)
                 database.insertKernel(resultKernelDict)
             else:
                 print('DataSet got deleted for kernel: '+kernelFileName)
     database.closeConnection()
 
-def analyseDataSet(dataSetRef,dataSetType,resultDataSetDict,dataSetAnalysersInstances=[]):
+def analyseDataSet(dataSetRef,dataSetType,resultDataSetDict,kernelCountPerDataSet,dataSetAnalysersInstances=[]):
     if(dataSetType!=KaggleEntityType.NONE and dataSetAnalysersInstances):
         for dataSetAnalyser in dataSetAnalysersInstances:
-            dataSetAnalyser.analyse(dataSetRef,dataSetType,resultDataSetDict)
+            dataSetAnalyser.analyse(dataSetRef,dataSetType,resultDataSetDict,kernelCountPerDataSet)
 
-def kernelAnalysersCloseDataSet(dataSetType,resultDataSetDict,kernelAnalysersInstances = []):
+def kernelAnalysersCloseDataSet(dataSetType,resultDataSetDict,kernelCountPerDataSet,kernelAnalysersInstances = []):
     if(dataSetType!=KaggleEntityType.NONE and kernelAnalysersInstances):
         for kernelAnalyser in kernelAnalysersInstances:
-            kernelAnalyser.onDataSetChanged(resultDataSetDict)
+            kernelAnalyser.onDataSetChanged(resultDataSetDict,kernelCountPerDataSet)
     
-def analyseKernelFile(filePath,resultKernelDict,kernelAnalysersInstances = []):
+def analyseKernelFile(filePath,resultKernelDict,kernelIndex,kernelAnalysersInstances = []):
     if os.path.exists(filePath):
         if os.stat(filePath).st_size == 0:
             os.remove(filePath)
@@ -129,7 +132,7 @@ def analyseKernelFile(filePath,resultKernelDict,kernelAnalysersInstances = []):
             #     language=KernelLanguage.PYTHON
             if 'cells' in kernelCode:
                 for kernelAnalyser in kernelAnalysersInstances:
-                        kernelAnalyser.analyse(kernelCode['cells'],resultKernelDict)
+                        kernelAnalyser.analyse(kernelCode['cells'],resultKernelDict,kernelIndex)
 
 
 # analyseOneKernelFile('C:/Users/garyee/gDrive/Colab/Kaggle/kernels/datasets/kaggle_____meta-kaggle/benhamner_____predicting-which-scripts-get-votes/predicting-which-scripts-get-votes.ipynb')

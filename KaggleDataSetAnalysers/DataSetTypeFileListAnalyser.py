@@ -8,7 +8,7 @@ import utils.database as database
 
 class DataSetTypeFileListAnalyser(KaggleDataSetAnalyser):
     
-    def analyse(self,entityRef,entityType,resDict):
+    def analyse(self,entityRef,entityType,resDict,kernelCountPerDataSet):
         command='kaggle datasets files '+entityRef
         if entityType==KaggleEntityType.COMPETITION:
             command='kaggle competitions files -q '+entityRef

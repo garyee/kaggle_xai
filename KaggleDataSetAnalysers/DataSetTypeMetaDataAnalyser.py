@@ -9,7 +9,7 @@ from utils.kaggleHelper import bash, setTypeAndCertainty
 
 class DataSetTypeMetaDataAnalyser(KaggleDataSetAnalyser):
     
-    def analyse(self,entityRef,entityType,resDict):
+    def analyse(self,entityRef,entityType,resDict,kernelCountPerDataSet):
         if entityType==KaggleEntityType.DATASET:
                 self.analyseDataSetMetaData(entityRef,resDict)
 

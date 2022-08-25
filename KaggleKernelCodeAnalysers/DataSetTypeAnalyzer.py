@@ -27,7 +27,7 @@ class DataSetTypeAnalyzer(KaggleKernelCodeAnalyzer):
               self._kernel_matches[dataSetType]=+regExMatchCount
             break
 
-  def onLastCell(self,resultKernelDict):
+  def onLastCell(self,resultKernelDict,kernelIndex):
     maxType=None
     maxCount=0
     for dataType, count in self._kernel_matches.items():
@@ -42,7 +42,7 @@ class DataSetTypeAnalyzer(KaggleKernelCodeAnalyzer):
     self._kernel_matches={}
     self._kernel_count+=1
       
-  def onDataSetChanged(self,resultDataSetDict):    
+  def onDataSetChanged(self,resultDataSetDict,kernelCountPerDataSet):    
     dataSetFinalType=None
     dataSetFinalCount=0
     for dataType, count in self._type_vote_per_data_set.items():
