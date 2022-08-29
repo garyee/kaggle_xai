@@ -22,7 +22,7 @@ class DataSetTypes(Enum):
       DataSetTypes.TIME_SERIES:[],
       DataSetTypes.BIOCHEM:['xyz'],
       DataSetTypes.GIS:['nmea','20o','21o','22o'],
-      DataSetTypes.CODE:['ipynb','py','js','html','in'],
+      DataSetTypes.CODE:['ipynb','py','js','html','in','whl'],
       DataSetTypes.MISC:[],
     }
     if(self is None):

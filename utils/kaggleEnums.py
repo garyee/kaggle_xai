@@ -209,6 +209,7 @@ def getAllKnownExtensions():
             'js',
             'ipynb',
             'html',
-            'in'
+            'in',
+            'whl'
             ]
 

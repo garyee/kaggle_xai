@@ -3,7 +3,7 @@ import re
 from KaggleKernelCodeAnalysers.KaggleKernelCodeAnalyzer import KaggleKernelCodeAnalyzer
 from utils.kaggleEnums import KaggleEntityType
 from utils.DataSetTypes import DataSetTypes
-from utils.kaggleHelper import setTypeAndCertainty
+from utils.kaggleHelper import setTypeAndCertainty, writeToWordCountJson
 
 class DataSetTargetColumnNameFinder(KaggleKernelCodeAnalyzer):
 
@@ -16,7 +16,7 @@ class DataSetTargetColumnNameFinder(KaggleKernelCodeAnalyzer):
     self.targetNameVoteArr={}
     self.modelsTrained=0
     self.predictionsMade=0
-    self.DataSet=0
+    self.kernelsWhichTrainOrPredictedCount=0
   
   def analyseCell(self,sourceCell):
     #Detect targetVariable
@@ -30,7 +30,6 @@ class DataSetTargetColumnNameFinder(KaggleKernelCodeAnalyzer):
         
         
         if(self.dataFrameName is not None):
-            print(self.dataFrameName)
           #"([A-Za-z0-9_]+)\s*=\s*"+self.dataFrameName+"\[['|\"]([^]]*)['|\"]]"
             yTargetRegex=r"([A-Za-z0-9_]+)\s*=\s*"+self.dataFrameName+"\[['|\"]([^]]*)['|\"]]"
             yTargetMatchCount=re.findall(yTargetRegex, sourceCell.strip().lower())
@@ -44,17 +43,17 @@ class DataSetTargetColumnNameFinder(KaggleKernelCodeAnalyzer):
 
     #detect fit/train
     trainRegex=r"\.fit\("
-    modelsTrained=re.findall(trainRegex, sourceCell.strip().lower())
-    if(len(yTargetMatchCount)>=1 ):
-      self.modelsTrained+=len(yTargetMatchCount)
+    modelsTrainedMatchCount=re.findall(trainRegex, sourceCell.strip().lower())
+    if(len(modelsTrainedMatchCount)>=1 ):
+      self.modelsTrained+=len(modelsTrainedMatchCount)
 
     predictRegex=r"\.predict\("
-    predictionsMade=re.findall(predictRegex, sourceCell.strip().lower())
-    if(len(predictionsMade)>=1 ):
-      self.predictionsMade+=len(predictionsMade)
+    predictionsMadeMatchCount=re.findall(predictRegex, sourceCell.strip().lower())
+    if(len(predictionsMadeMatchCount)>=1 ):
+      self.predictionsMade+=len(predictionsMadeMatchCount)
         
     #detect targetValueName
-
+    #TODO
         
     # for dataSetType in DataSetTypes:
     #   regexArr= dataSetType.getWordCountRefExes()
@@ -70,14 +69,17 @@ class DataSetTargetColumnNameFinder(KaggleKernelCodeAnalyzer):
 
   def onLastCell(self,resultKernelDict,kernelIndex):
     if(self.targetName is not None):
+        writeToWordCountJson(self.targetName,'targetNamesCount')
         if(self.targetName not in self.targetNameVoteArr):
             self.targetNameVoteArr[self.targetName]=1
         else:
             self.targetNameVoteArr[self.targetName]+=1
-        if(self.modelsTrained>0):
-            resultKernelDict['modelsTrained']=self.modelsTrained
-        if(self.predictionsMade>0):
-            resultKernelDict['predictionsMade']=self.predictionsMade
+    if(self.modelsTrained>0):
+       resultKernelDict['modelsTrained']=self.modelsTrained
+    if(self.predictionsMade>0):
+      resultKernelDict['predictionsMade']=self.predictionsMade
+    if(self.modelsTrained>0 or self.predictionsMade>0):
+      self.kernelsWhichTrainOrPredictedCount+=1
     self.dataFrameName=None
     self.targetName=None
     self.modelsTrained=0
@@ -95,7 +97,11 @@ class DataSetTargetColumnNameFinder(KaggleKernelCodeAnalyzer):
                 targetNameMaxCount=count
         if(targetNameWinner is not None):
             resultDataSetDict['tab_target_col']=targetNameWinner
-
-            tab_has_target_propability
+    if(self.kernelsWhichTrainOrPredictedCount>0):
+            proba=self.kernelsWhichTrainOrPredictedCount/kernelCountPerDataSet*100
+            if(proba>100):
+              print('proba error in:'+resultDataSetDict['dataSetRef'])
+            resultDataSetDict['tab_has_target_propability']=int(proba)
+    self.kernelsWhichTrainOrPredictedCount=0
     self.targetNameVoteArr={}
 

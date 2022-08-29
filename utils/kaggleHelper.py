@@ -1,4 +1,7 @@
+import json
+from msilib.schema import Error
 import os
+from pickle import NONE
 import pandas as pd
 from io import StringIO
 from utils.DataSetTypes import DataSetTypes
@@ -30,3 +33,21 @@ def getTypeAndCertainty(type,typeCertainty,resTypeStr=None,resSetCertainty=None)
         if(resSetCertainty>typeCertainty):
             return resType.value,resSetCertainty
     return type.value,typeCertainty
+
+def writeToWordCountJson(word,filename):
+  filename=filename+'.json'
+  words={}
+
+  if os.path.exists(filename):
+    with open(filename) as f:
+      try:
+        words = json.load(f)
+      except (ValueError) as e:
+        words = {}
+    
+  with open(filename, 'w') as fw:
+    if(word in words):
+      words[word]+=1
+    else:
+      words[word]=1
+    json.dump(words, fw, indent=4,sort_keys=True)
