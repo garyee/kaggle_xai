@@ -9,15 +9,21 @@ from utils.DownloaderErrors import PageDoesNotExistError
 import subprocess
 
 def bash(command):
+  try:
     x = subprocess.check_output(command)
-    # # charDectRes=chardet.detect(x)
     resStr=x.decode('utf-8')
-    return resStr
+  except subprocess.CalledProcessError:
+    print('there has been an subprocess error with: '+command)
+    resStr=None
+    # # charDectRes=chardet.detect(x)
+  return resStr
     # output = os.popen(command).read()
     # return output
 
 def kaggleCommand2DF(command):
   result=bash(command+" --csv")
+  if(result is None):
+    return pd.DataFrame();
   if('No datasets found' in result or 'No kernels found' in result):
     raise PageDoesNotExistError(command)
   return pd.read_csv(StringIO(result))
