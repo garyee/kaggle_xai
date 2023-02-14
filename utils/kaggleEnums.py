@@ -47,7 +47,7 @@ testKernelsRefs={KaggleEntityType.DATASET: {},
 parentEntityPathStrList=['datasets','competitions','none']
 
 #filePath= '/content/drive/MyDrive/Colab'
-filePath="C:/Users/garyee/gDrive/Colab/Kaggle/"
+filePath="C:\\Users\\mrd\\Downloads\\"
 basePath= filePath+'kernels/'
 baseTmpPath= filePath+'tmp/'
 

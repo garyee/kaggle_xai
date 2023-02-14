@@ -1,7 +1,6 @@
 import os
 import re
 import shutil
-from utils.DataSetTypes import DataSetTypes
 from utils.DownloaderErrors import PageDoesNotExistError
 from utils.kaggleEnums import KaggleEntityType,getKaggleEntityBasePath,getKaggleEntityString,getPathNameFromKaggleRef, testKernelsRefs
 from utils.kaggleHelper import bash,kaggleCommand2DF
