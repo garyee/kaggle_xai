@@ -23,6 +23,12 @@ def getAllKernelsForKaggleMostVotedEntity(entityType=KaggleEntityType.DATASET,pa
   commandStr='kaggle '+getKaggleEntityString(entityType,True)+' list -s tabular'
   pagination(commandStr,getKernelsByParentEntity,entityType,entityType,None,page)
   
+def cleanDataSetRef(ref):
+  if(ref.startswith("https://www.kaggle.com/")):
+    return ref.rsplit('/', 1)[-1]
+  else:
+    return ref
+
 def getKernelsByParentEntity(currentDataSetRef,entityType,_=None):
     commandStr='kaggle kernels list --language python --sort-by voteCount --'+getKaggleEntityString(entityType)+' '+currentDataSetRef
     pagination(commandStr,downloadKernelByRef,KaggleEntityType.KERNEL,currentDataSetRef,entityType)
@@ -44,7 +50,7 @@ def pagination(commandStr,callback,paginatedType,param1,param2=None,startPage=1)
   while i<currentList.shape[0]:
     if(paginatedType==KaggleEntityType.DATASET):
       print(getKaggleEntityString(paginatedType)+ ': ' + currentList.iloc[i,0]+' '+str(page))
-    callback(currentList.iloc[i,0],param1,param2)
+    callback(cleanDataSetRef(currentList.iloc[i,0]),param1,param2)
     pbar.update(1)
     i+=1
     if((currentList.shape[0])==i and currentList.shape[0]>0.5*paginatedType.getPageSize()):
