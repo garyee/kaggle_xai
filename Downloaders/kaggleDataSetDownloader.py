@@ -2,13 +2,16 @@ import os
 import shutil
 import pandas as pd
 from utils.DataSetTypes import DataSetTypes
+from utils.KaggleCommands.KaggleCommand import KaggleCommandOperations
+from utils.KaggleCommands.KaggleCommandFactory import KaggleCommandFactory
 from utils.kaggleEnums import compressionExtensions,baseTmpPath,KaggleEntityType, getKaggleEntityString, getPathNameFromKaggleRef, isArchiveFile
 from utils.kaggleHelper import bash,kaggleCommand2DF
 from utils.webStuff import acceptCompetitionRules
 
 def getFileListByDataSetRef(dataSetRef,dataSetType =KaggleEntityType.DATASET):
-    command ='kaggle '+getKaggleEntityString(dataSetType,True)+' files '+dataSetRef
-    fileList = kaggleCommand2DF(command)
+    # command ='kaggle '+getKaggleEntityString(dataSetType,True)+' files '+dataSetRef
+    # fileList = kaggleCommand2DF(command)
+    fileList = KaggleCommandFactory.buildCommand(dataSetType, KaggleCommandOperations.FILES).execute()
     return list(fileList.iloc[:,0])
 
 

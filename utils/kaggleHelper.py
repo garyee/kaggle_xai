@@ -1,17 +1,18 @@
 import json
-from msilib.schema import Error
 import os
-from pickle import NONE
 import pandas as pd
+from win_unicode_console import enable
 from io import StringIO
 from utils.DataSetTypes import DataSetTypes
-from utils.DownloaderErrors import PageDoesNotExistError
+from utils.CustomExceptions import PageDoesNotExistError
 import subprocess
+import sys
 
 def bash(command):
+  enable(use_unicode_argv=True)
   try:
-    x = subprocess.check_output(command)
-    resStr=x.decode('utf-8')
+    resStr = subprocess.check_output(command,encoding='utf-8')
+    # resStr=x.decode('utf-8')
   except subprocess.CalledProcessError:
     print('there has been an subprocess error with: '+command)
     resStr=None
@@ -19,6 +20,24 @@ def bash(command):
   return resStr
     # output = os.popen(command).read()
     # return output
+
+# def bash(command):
+#   print (sys.stdout.encoding)
+#   try:
+#     x=subprocess.check_output('chcp 65001 | powershell '+command,shell=True, stderr=subprocess.STDOUT)
+#     # resStr=x.decode('utf-8')
+#   except subprocess.CalledProcessError as e:
+#     print('there has been an subprocess error with: '+command)
+#     print(e.output)
+#     print(x)
+#     # resStr=None
+#     # # charDectRes=chardet.detect(x)
+#   # return resStr
+  
+  # has maybe worked some time, prints the output with newline chars
+  
+  # output = os.popen(command).read()
+  # return output
 
 def kaggleCommand2DF(command):
   result=bash(command+" --csv")

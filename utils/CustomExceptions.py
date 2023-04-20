@@ -8,3 +8,6 @@ class BaseCustomException(Exception):
 
 class PageDoesNotExistError(BaseCustomException):
     """Raised when the page does not exist"""
+
+class CommandTypDoesNotExist(BaseCustomException):
+    """The type of command does not exist"""

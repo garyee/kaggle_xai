@@ -1,5 +1,8 @@
 from Downloaders.kaggleCodeDownloader import getAllKernelsForKaggleMostVotedEntity
+from utils.KaggleCommands.KaggleCommand import KaggleCommand, KaggleCommandOperations
 from utils.kaggleEnums import KaggleEntityType
 
-
-getAllKernelsForKaggleMostVotedEntity(KaggleEntityType.COMPETITION,1)
+# ret=KaggleCommand.buildCommand(KaggleEntityType.DATASET, KaggleCommandOperations.LIST)
+# print(ret.execute())
+ 
+getAllKernelsForKaggleMostVotedEntity()

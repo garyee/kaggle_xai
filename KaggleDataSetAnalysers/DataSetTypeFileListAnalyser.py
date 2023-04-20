@@ -1,18 +1,21 @@
 import os
 import re
 from KaggleDataSetAnalysers.KaggleDataSetAnalyser import KaggleDataSetAnalyser
+from utils.KaggleCommands.KaggleCommand import KaggleCommandOperations
+from utils.KaggleCommands.KaggleCommandFactory import KaggleCommandFactory
 from utils.kaggleEnums import KaggleEntityType, getAllKnownExtensions, compressionExtensions
 from utils.DataSetTypes import DataSetTypes
-from utils.kaggleHelper import kaggleCommand2DF, setTypeAndCertainty
+from utils.kaggleHelper import setTypeAndCertainty
 import utils.database as database
 
 class DataSetTypeFileListAnalyser(KaggleDataSetAnalyser):
     
     def analyse(self,entityRef,entityType,resDict,kernelCountPerDataSet):
-        command='kaggle datasets files '+entityRef
-        if entityType==KaggleEntityType.COMPETITION:
-            command='kaggle competitions files -q '+entityRef
-        fileList = kaggleCommand2DF(command)
+        # command='kaggle datasets files '+entityRef
+        # if entityType==KaggleEntityType.COMPETITION:
+        #     command='kaggle competitions files -q '+entityRef
+        
+        fileList = KaggleCommandFactory.buildCommand(entityType, KaggleCommandOperations.FILES).execute()
         countPerType={}
         overAllFileSize=0
         if fileList.empty:
