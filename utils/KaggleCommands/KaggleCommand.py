@@ -77,7 +77,7 @@ class KaggleCommand():
             else:
                 raise CommandTypDoesNotExist()
         elif self.entity==KaggleEntityType.COMPETITION:
-            raise CommandTypDoesNotExist()
+            raise CommandTypDoesNotExist(str(self.entity)+' '+str(self.operation))
         elif self.entity==KaggleEntityType.KERNEL:
             if(self.operation==KaggleCommandOperations.DOWNLOAD):
                 #https://github.com/Kaggle/kaggle-api/blob/15cb3f2490db9e0fad4b7662e3621ad949232510/kaggle/api/kaggle_api_extended.py#L828
@@ -92,9 +92,13 @@ class KaggleCommand():
                 del self._parameters['page']
                 del self._parameters['max-size']
                 del self._parameters['min-size']
+                path=self._parameters['path']
                 del self._parameters['path']
-                return getApi().kernel_pull(self.entityRef.split("/")[0],self.entityRef.split("/")[1],**self.parameters)
-            if(self.operation==KaggleCommandOperations.LIST):
+                res = getApi().kernel_pull(self.entityRef.split("/")[0],self.entityRef.split("/")[1],**self.parameters)
+                f = open(path+res['metadata']['slug']+'.ipynb', "w",encoding="utf-8")
+                f.write(res['blob']['source'])
+                f.close()
+            elif(self.operation==KaggleCommandOperations.LIST):
                 #https://github.com/Kaggle/kaggle-api/blob/15cb3f2490db9e0fad4b7662e3621ad949232510/kaggle/api/kaggle_api_extended.py#L828
                 del self._parameters['size']
                 del self._parameters['file-type']
@@ -106,9 +110,9 @@ class KaggleCommand():
                 del self._parameters['page-size']
                 return getApi().kernels_list(**self.parameters)
             else:
-                raise CommandTypDoesNotExist()
+                raise CommandTypDoesNotExist(str(self.entity)+' '+str(self.operation))
         else:
-            raise CommandTypDoesNotExist()
+            raise CommandTypDoesNotExist(str(self.entity)+' '+str(self.operation))
 
 class KaggleCommandOperations(Enum):
   LIST = 1

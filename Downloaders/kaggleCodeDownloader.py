@@ -75,10 +75,8 @@ def downloadKernelByRef(kernelRef,parentEntitySetRef,parentEntityType=KaggleEnti
   if(not os.path.exists(path4currentKernel)):
     os.makedirs(path4currentKernel)
     command=KaggleCommand.buildCommand(KaggleEntityType.KERNEL,KaggleCommandOperations.DOWNLOAD,{'path':path4currentKernel},kernelRef)
-    res = command.execute()
-    f = open(path4currentKernel+res['metadata']['slug']+'.ipynb', "w")
-    f.write(res['blob']['source'])
-    f.close()
+    command.execute()
+    
     # res=bash('kaggle kernels pull '+kernelRef+' -p '+path4currentKernel)
     # if 'Source code downloaded' not in res:
     #   if('404 - Not Found' in res:
